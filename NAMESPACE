@@ -3,6 +3,7 @@
 export(calc_change_cumu)
 export(calc_change_incr)
 export(height_to_mm)
+export(plot_cumu_arm)
 export(plot_cumu_set)
 export(plot_hist_arm)
 export(plot_raw_arm)

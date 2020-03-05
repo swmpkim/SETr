@@ -16,13 +16,13 @@
 height_to_mm <- function(data){
     if(exists('height_cm', data)) {
         data <- data %>%
-            mutate(pin_height = .data$height_cm * 10) %>%
-            select(-.data$height_cm)
+            dplyr::mutate(pin_height = .data$height_cm * 10) %>%
+            dplyr::select(-.data$height_cm)
     }
     if(exists('height_mm', data)){
         data <- data %>%
-            mutate(pin_height = .data$height_mm) %>%
-            select(-.data$height_mm)
+            dplyr::mutate(pin_height = .data$height_mm) %>%
+            dplyr::select(-.data$height_mm)
     }
     return(data)
 }

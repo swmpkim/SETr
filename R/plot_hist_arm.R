@@ -11,13 +11,13 @@
 #' plot_hist_arm(example_sets)
 
 plot_hist_arm <- function(data, columns = 4, scales = "free_y"){
-    ggplot(data) +
-        geom_histogram(aes(.data$pin_height, fill = as.factor(.data$arm_position)), color = 'black') +
-        facet_wrap(~.data$set_id, ncol = columns, scales = scales) +
-        labs(title = 'Histogram of raw pin heights by SET',
+    ggplot2::ggplot(data) +
+        ggplot2::geom_histogram(ggplot2::aes(.data$pin_height, fill = as.factor(.data$arm_position)), color = 'black') +
+        ggplot2::facet_wrap(~.data$set_id, ncol = columns, scales = scales) +
+        ggplot2::labs(title = 'Histogram of raw pin heights by SET',
              subtitle = 'colored by arm position; stacked',
              x = 'Pin Height (mm)',
              fill = 'Arm Position') +
-        theme_bw() +
-        theme(legend.position = 'bottom')
+        ggplot2::theme_bw() +
+        ggplot2::theme(legend.position = 'bottom')
 }

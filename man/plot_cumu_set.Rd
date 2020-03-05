@@ -2,13 +2,13 @@
 % Please edit documentation in R/plot_cumu_set.R
 \name{plot_cumu_set}
 \alias{plot_cumu_set}
-\title{Make a graph of change over time}
+\title{Make a graph of change over time by SET}
 \usage{
 plot_cumu_set(data, columns = 4, pointsize = 3.5, scales = "fixed",
   smooth = TRUE, lty_smooth = 5)
 }
 \arguments{
-\item{data}{data frame (e.g. `$set` piece of output from `calc_change_cumu()`)}
+\item{data}{data frame (e.g. `$set` piece of output from `calc_change_cumu()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, mean_cumu. `mean_cumu` should be an already-calculated field of change since baseline.}
 
 \item{columns}{number of columns you want in the faceted output}
 
