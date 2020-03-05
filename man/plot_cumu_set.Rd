@@ -14,7 +14,7 @@ plot_cumu_set(data, columns = 4, pointsize = 3.5, scales = "fixed",
 
 \item{pointsize}{size of points you want (goes into the `size` argument of `ggplot2::geom_point`)}
 
-\item{scales}{free or fixed (goes into `scales` arg of `facet_wrap`)}
+\item{scales}{passed to `facet_wrap`; same fixed/free options as that function}
 
 \item{smooth}{do you want a linear regression plotted on top?}
 

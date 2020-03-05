@@ -5,7 +5,7 @@
 #' @param data data frame (e.g. `$set` piece of output from `calc_change_cumu()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, mean_cumu. `mean_cumu` should be an already-calculated field of change since baseline.
 #' @param columns number of columns you want in the faceted output
 #' @param pointsize size of points you want (goes into the `size` argument of `ggplot2::geom_point`)
-#' @param scales free or fixed (goes into `scales` arg of `facet_wrap`)
+#' @param scales passed to `facet_wrap`; same fixed/free options as that function
 #' @param smooth do you want a linear regression plotted on top?
 #' @param lty_smooth type of line (1 = solid; 2 and 5 = dashed; normal line types)
 #'
