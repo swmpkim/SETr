@@ -1,9 +1,9 @@
 #' Plot change between readings, by arm
 #'
 #' @param data data frame (e.g. `$arm` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, mean_incr. `mean_incr` should be an already-calculated field of change since previous reading
+#' @param set optional SET ID if you only want to look at one SET; default is to graph all SETs
 #' @param threshold numeric value for red horizontal lines (at +/- this value); this should be a value that would be a meaningful threshold for incremental change.
 #' @param columns number of columns for faceted output
-#' @param set optional SET ID if you only want to look at one SET; default is to graph all SETs
 #' @param pointsize size of points you want (goes into the `size` argument of `ggplot2::geom_point`)
 #' @param scales passed to `facet_wrap`; same fixed/free options as that function
 #'
@@ -17,7 +17,7 @@
 #' plot_incr_arm(incr_set$arm, set = "SET2", threshold = 5)
 
 
-plot_incr_arm <- function(data, threshold = 25, columns = 4, set = NULL,
+plot_incr_arm <- function(data, set = NULL, threshold = 25, columns = 4,
                           pointsize = 2, scales = "fixed"){
     # data needs to be the $arm piece of the output from calc_change_inc
     if(is.null(set)){
@@ -30,7 +30,7 @@ plot_incr_arm <- function(data, threshold = 25, columns = 4, set = NULL,
         plot_title <- paste('Incremental Change by arm at', set)
     }
 
-    ggplot2::ggplot(to_plot, ggplot2::aes(x = date,
+    ggplot2::ggplot(data = to_plot, ggplot2::aes(x = date,
                                           y = mean_incr,
                                           color = as.factor(arm_position))) +
         ggplot2::geom_point(size = pointsize) +

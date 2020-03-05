@@ -4,17 +4,17 @@
 \alias{plot_incr_arm}
 \title{Plot change between readings, by arm}
 \usage{
-plot_incr_arm(data, threshold = 25, columns = 4, set = NULL,
+plot_incr_arm(data, set = NULL, threshold = 25, columns = 4,
   pointsize = 2, scales = "fixed")
 }
 \arguments{
 \item{data}{data frame (e.g. `$arm` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, mean_incr. `mean_incr` should be an already-calculated field of change since previous reading}
 
+\item{set}{optional SET ID if you only want to look at one SET; default is to graph all SETs}
+
 \item{threshold}{numeric value for red horizontal lines (at +/- this value); this should be a value that would be a meaningful threshold for incremental change.}
 
 \item{columns}{number of columns for faceted output}
-
-\item{set}{optional SET ID if you only want to look at one SET; default is to graph all SETs}
 
 \item{pointsize}{size of points you want (goes into the `size` argument of `ggplot2::geom_point`)}
 
@@ -29,6 +29,6 @@ Plot change between readings, by arm
 \examples{
 incr_set <- calc_change_incr(example_sets)
 plot_incr_arm(incr_set$arm)
-plot_incr_arm(incr_set$arm, threshold = 50, columns = 1)
-plot_incr_arm(incr_set$arm, set = "SET2", threshold = 10)
+plot_incr_arm(incr_set$arm, threshold = 5, columns = 1)
+plot_incr_arm(incr_set$arm, set = "SET2", threshold = 5)
 }
