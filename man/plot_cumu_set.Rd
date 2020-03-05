@@ -8,7 +8,7 @@ plot_cumu_set(data, columns = 4, pointsize = 3.5, scales = "fixed",
   smooth = TRUE, lty_smooth = 5)
 }
 \arguments{
-\item{data}{data frame}
+\item{data}{data frame (e.g. `$set` piece of output from `calc_change_cumu()`)}
 
 \item{columns}{number of columns you want in the faceted output}
 

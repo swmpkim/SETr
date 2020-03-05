@@ -2,7 +2,7 @@
 #'
 #' x-axis is date; y-axis is the average of the 36 pin heights' difference from baseline (first measurement). One facet per SET id.
 #'
-#' @param data data frame
+#' @param data data frame (e.g. `$set` piece of output from `calc_change_cumu()`)
 #' @param columns number of columns you want in the faceted output
 #' @param pointsize size of points you want (goes into the `size` argument of `ggplot2::geom_point`)
 #' @param scales free or fixed (goes into `scales` arg of `facet_wrap`)
