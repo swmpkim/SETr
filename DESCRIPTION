@@ -17,6 +17,7 @@ Imports:
     dplyr,
     magrittr,
     ggplot2,
-    rlang
+    rlang,
+    stats
 Suggests: 
     testthat (>= 2.1.0)
