@@ -25,28 +25,28 @@ calc_change_incr <- function(data){
 
     # by pin
     change_incr_pin <- data %>%
-        arrange(.data$set_id, .data$arm_position, .data$pin_number, .data$date) %>%
-        group_by(.data$set_id, .data$arm_position, .data$pin_number) %>%
-        mutate(incr = .data$pin_height - dplyr::lag(.data$pin_height, 1)) %>%
-        ungroup()
+        dplyr::arrange(.data$set_id, .data$arm_position, .data$pin_number, .data$date) %>%
+        dplyr::group_by(.data$set_id, .data$arm_position, .data$pin_number) %>%
+        dplyr::mutate(incr = .data$pin_height - dplyr::lag(.data$pin_height, 1)) %>%
+        dplyr::ungroup()
 
     # pins averaged up to arms
     change_incr_arm <- change_incr_pin %>%
-        group_by(.data$set_id, .data$arm_position, .data$date) %>%
-        select(-.data$pin_number) %>%
-        summarize(mean_incr = mean(.data$incr, na.rm = TRUE),
+        dplyr::group_by(.data$set_id, .data$arm_position, .data$date) %>%
+        dplyr::select(-.data$pin_number) %>%
+        dplyr::summarize(mean_incr = mean(.data$incr, na.rm = TRUE),
                   sd_incr = stats::sd(.data$incr, na.rm = TRUE),
                   se_incr = stats::sd(.data$incr, na.rm = TRUE)/sqrt(length(!is.na(.data$incr)))) %>%
-        ungroup()
+        dplyr::ungroup()
 
     # arms averaged up to SETs
     change_incr_set <- change_incr_arm %>%
-        group_by(.data$set_id, .data$date) %>%
-        select(-.data$arm_position, mean_value = .data$mean_incr) %>%
-        summarize(mean_incr = mean(.data$mean_value, na.rm = TRUE),
+        dplyr::group_by(.data$set_id, .data$date) %>%
+        dplyr::select(-.data$arm_position, mean_value = .data$mean_incr) %>%
+        dplyr::summarize(mean_incr = mean(.data$mean_value, na.rm = TRUE),
                   sd_incr = stats::sd(.data$mean_value, na.rm = TRUE),
                   se_incr = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(length(!is.na(.data$mean_value)))) %>%
-        ungroup()
+        dplyr::ungroup()
 
     return(list(pin = change_incr_pin, arm = change_incr_arm, set = change_incr_set))
 }

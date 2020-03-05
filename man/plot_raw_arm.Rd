@@ -8,7 +8,7 @@ plot_raw_arm(data, columns = 4, pointsize = 2, sdline = TRUE,
   sdlinesize = 1, scales = "free_y")
 }
 \arguments{
-\item{data}{a data frame with one row per pin reading, and the following columns, named exactly: date, set_id, arm_position, pin_number, pin_height}
+\item{data}{a data frame with one row per pin reading, and the following columns, named exactly: date, set_id, arm_position, pin_height}
 
 \item{columns}{number of columns for the faceted graph}
 

@@ -19,20 +19,20 @@
 
 plot_cumu_set <- function(data, columns = 4, pointsize = 3.5, scales = "fixed", smooth = TRUE, lty_smooth = 5){
     # data needs to be the $set piece of the output from calc_change_cumu
-    ggplot(data, aes(x = .data$date, y = .data$mean_cumu)) +
-        geom_line(col = 'lightsteelblue4') +
-        {if(smooth) geom_smooth(se = FALSE, method = 'lm',
+    ggplot2::ggplot(data, ggplot2::aes(x = .data$date, y = .data$mean_cumu)) +
+        ggplot2::geom_line(col = 'lightsteelblue4') +
+        {if(smooth) ggplot2::geom_smooth(se = FALSE, method = 'lm',
                                 col = 'steelblue4', lty = lty_smooth, size = 1)} +
-        geom_point(shape = 21,
+        ggplot2::geom_point(shape = 21,
                    fill = 'lightsteelblue1', col = 'steelblue3',
                    size = pointsize, alpha = 0.9) +
-        facet_wrap(~.data$set_id, ncol = columns, scales = scales) +
-        {if(smooth) labs(title = 'Cumulative Change since first reading',
+        ggplot2::facet_wrap(~.data$set_id, ncol = columns, scales = scales) +
+        {if(smooth) ggplot2::labs(title = 'Cumulative Change since first reading',
                          subtitle = 'dashed line is linear regression',
                          x = 'Date',
                          y = 'Change since first reading (mm)')} +
-        {if(!smooth) labs(title = 'Cumulative Change since first reading',
+        {if(!smooth) ggplot2::labs(title = 'Cumulative Change since first reading',
                           x = 'Date',
                           y = 'Change since first reading (mm)')} +
-        theme_classic()
+        ggplot2::theme_classic()
 }
