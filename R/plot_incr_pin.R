@@ -18,9 +18,11 @@
 
 plot_incr_pin <- function(data, set, threshold = 25, columns = 2, pointsize = 2, scales = "fixed"){
     # data needs to be the $pin piece of the output from calc_change_inc
+    # names in arguments default to columns used in SETr project
+    # WHY ISN'T IT SCREAMING ABOUT NO GLOBAL BINDING FOR ARM POSITION (in facet)
     ggplot2::ggplot(data = dplyr::filter(data, .data$set_id == !!set),
-                    ggplot2::aes(x = date, y = incr,
-               color = as.factor(pin_number))) +
+                    ggplot2::aes(x = .data$date, y = .data$incr,
+               color = as.factor(.data$pin_number))) +
         ggplot2::geom_point(size = pointsize) +
         ggplot2::geom_hline(yintercept = threshold, col = "red", size = 1) +
         ggplot2::geom_hline(yintercept = -1*threshold, col = "red", size = 1) +

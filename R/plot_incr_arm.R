@@ -30,9 +30,9 @@ plot_incr_arm <- function(data, set = NULL, threshold = 25, columns = 4,
         plot_title <- paste('Incremental Change by arm at', set)
     }
 
-    ggplot2::ggplot(data = to_plot, ggplot2::aes(x = date,
-                                          y = mean_incr,
-                                          color = as.factor(arm_position))) +
+    ggplot2::ggplot(data = to_plot, ggplot2::aes(x = .data$date,
+                                          y = .data$mean_incr,
+                                          color = as.factor(.data$arm_position))) +
         ggplot2::geom_point(size = pointsize) +
         ggplot2::geom_hline(yintercept = threshold, col = "red", size = 1) +
         ggplot2::geom_hline(yintercept = -1*threshold, col = "red", size = 1) +
