@@ -22,8 +22,11 @@ calc_change_cumu <- function(dat) {
 
     ## calculations
 
+    # have to make sure to arrange properly so correct pin reading is subtracted off
+
     # by pin
     change_cumu_pin <- dat %>%
+        dplyr::arrange(.data$set_id, .data$arm_position, .data$pin_number, .data$date) %>%
         dplyr::group_by(.data$set_id, .data$arm_position, .data$pin_number) %>%
         dplyr::mutate(cumu = .data$pin_height - .data$pin_height[1]) %>%
         # mutate(cumu = pin_height - pin_height[min(which(!is.na(pin_height)))]) %>% ##### subtract off the first pin reading that's not NA

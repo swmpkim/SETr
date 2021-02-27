@@ -1,6 +1,6 @@
 Package: SETr
 Title: Functions for working with Surface Elevation Table (SET) data
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person(given = "Kim",
            family = "Cressman",
