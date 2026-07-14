@@ -39,7 +39,7 @@ calc_change_cumu <- function(dat) {
         dplyr::select(-.data$pin_number) %>%
         dplyr::summarize(mean_cumu = mean(.data$cumu, na.rm = TRUE),
                   sd_cumu = stats::sd(.data$cumu, na.rm = TRUE),
-                  se_cumu = stats::sd(.data$cumu, na.rm = TRUE)/sqrt(length(!is.na(.data$cumu)))) %>%
+                  se_cumu = stats::sd(.data$cumu, na.rm = TRUE)/sqrt(sum(!is.na(.data$cumu)))) %>%
         dplyr::ungroup()
 
     # arms averaged up to SETs
@@ -48,7 +48,7 @@ calc_change_cumu <- function(dat) {
         dplyr::select(-.data$arm_position, mean_value = .data$mean_cumu) %>%
         dplyr::summarize(mean_cumu = mean(.data$mean_value, na.rm = TRUE),
                   sd_cumu = stats::sd(.data$mean_value, na.rm = TRUE),
-                  se_cumu = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(length(!is.na(.data$mean_value)))) %>%
+                  se_cumu = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(sum(!is.na(.data$mean_value)))) %>%
         dplyr::ungroup()
 
     return(list(pin = change_cumu_pin, arm = change_cumu_arm, set = change_cumu_set))
