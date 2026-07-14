@@ -4,8 +4,14 @@
 \alias{plot_raw_arm}
 \title{Plot raw pin measurements, first averaged to arm level, by date}
 \usage{
-plot_raw_arm(data, columns = 4, pointsize = 2, sdline = TRUE,
-  sdlinesize = 1, scales = "free_y")
+plot_raw_arm(
+  data,
+  columns = 4,
+  pointsize = 2,
+  sdline = TRUE,
+  sdlinesize = 1,
+  scales = "free_y"
+)
 }
 \arguments{
 \item{data}{a data frame with one row per pin reading, and the following columns, named exactly: date, set_id, arm_position, pin_height}

@@ -4,8 +4,14 @@
 \alias{plot_incr_pin}
 \title{Plot change between readings, by pin}
 \usage{
-plot_incr_pin(data, set, threshold = 25, columns = 2, pointsize = 2,
-  scales = "fixed")
+plot_incr_pin(
+  data,
+  set,
+  threshold = 25,
+  columns = 2,
+  pointsize = 2,
+  scales = "fixed"
+)
 }
 \arguments{
 \item{data}{data frame (e.g. `$pin` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, pin_number, incr. `incr` should be an already-calculated field of change since previous reading.}

@@ -1,9 +1,9 @@
 ## code to prepare `example_sets` dataset goes here
 
-usethis::use_data(example_sets)
+usethis::use_data(example_sets, overwrite = TRUE)
 
 example_sets <- data.frame(stringsAsFactors=FALSE,
-                           date = c("2010-06-01", "2010-06-01", "2010-06-01", "2010-06-01",
+                           date = as.Date(c("2010-06-01", "2010-06-01", "2010-06-01", "2010-06-01",
                                     "2010-06-01", "2010-06-01", "2011-06-15",
                                     "2011-06-15", "2011-06-15", "2011-06-15",
                                     "2011-06-15", "2011-06-15", "2012-06-05",
@@ -13,7 +13,7 @@ example_sets <- data.frame(stringsAsFactors=FALSE,
                                     "2010-06-01", "2011-06-15", "2011-06-15",
                                     "2011-06-15", "2011-06-15", "2011-06-15",
                                     "2011-06-15", "2012-06-05", "2012-06-05",
-                                    "2012-06-05", "2012-06-05", "2012-06-05", "2012-06-05"),
+                                    "2012-06-05", "2012-06-05", "2012-06-05", "2012-06-05")),
                          set_id = c("SET1", "SET1", "SET1", "SET1", "SET1", "SET1", "SET1",
                                     "SET1", "SET1", "SET1", "SET1", "SET1",
                                     "SET1", "SET1", "SET1", "SET1", "SET1", "SET1",

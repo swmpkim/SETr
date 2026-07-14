@@ -4,9 +4,22 @@
 \alias{plot_rate_comps}
 \title{Graphical comparison of SET change rates to SLR}
 \usage{
-plot_rate_comps(data, plot_type = 3, color_by_veg = FALSE, set_ids,
-  set_ci_low, set_ci_high, rates, comp1, comp1_ci_low, comp1_ci_high,
-  comp2 = NULL, comp2_ci_low = NULL, comp2_ci_high = NULL, veg)
+plot_rate_comps(
+  data,
+  plot_type = 3,
+  color_by_veg = FALSE,
+  set_ids,
+  set_ci_low,
+  set_ci_high,
+  rates,
+  comp1,
+  comp1_ci_low,
+  comp1_ci_high,
+  comp2 = NULL,
+  comp2_ci_low = NULL,
+  comp2_ci_high = NULL,
+  veg
+)
 }
 \arguments{
 \item{data}{a data frame}

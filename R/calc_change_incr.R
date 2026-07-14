@@ -36,7 +36,7 @@ calc_change_incr <- function(data){
         dplyr::select(-.data$pin_number) %>%
         dplyr::summarize(mean_incr = mean(.data$incr, na.rm = TRUE),
                   sd_incr = stats::sd(.data$incr, na.rm = TRUE),
-                  se_incr = stats::sd(.data$incr, na.rm = TRUE)/sqrt(length(!is.na(.data$incr)))) %>%
+                  se_incr = stats::sd(.data$incr, na.rm = TRUE)/sqrt(sum(!is.na(.data$incr)))) %>%
         dplyr::ungroup()
 
     # arms averaged up to SETs
@@ -45,7 +45,7 @@ calc_change_incr <- function(data){
         dplyr::select(-.data$arm_position, mean_value = .data$mean_incr) %>%
         dplyr::summarize(mean_incr = mean(.data$mean_value, na.rm = TRUE),
                   sd_incr = stats::sd(.data$mean_value, na.rm = TRUE),
-                  se_incr = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(length(!is.na(.data$mean_value)))) %>%
+                  se_incr = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(sum(!is.na(.data$mean_value)))) %>%
         dplyr::ungroup()
 
     return(list(pin = change_incr_pin, arm = change_incr_arm, set = change_incr_set))

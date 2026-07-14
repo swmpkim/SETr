@@ -4,8 +4,14 @@
 \alias{plot_incr_arm}
 \title{Plot change between readings, by arm}
 \usage{
-plot_incr_arm(data, set = NULL, threshold = 25, columns = 4,
-  pointsize = 2, scales = "fixed")
+plot_incr_arm(
+  data,
+  set = NULL,
+  threshold = 25,
+  columns = 4,
+  pointsize = 2,
+  scales = "fixed"
+)
 }
 \arguments{
 \item{data}{data frame (e.g. `$arm` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, mean_incr. `mean_incr` should be an already-calculated field of change since previous reading}
