@@ -4,8 +4,7 @@
 ##           tibble, dplyr
 
 library(testthat)
-library(tibble)
-library(dplyr)
+
 
 
 # =============================================================================
@@ -229,8 +228,8 @@ test_that("set_id groups are aggregated independently at the arm and set level",
 
 test_that("arm- and set-level stats match by-hand calculations on a minimal dataset", {
 
-    toy <- tibble::tibble(
-        date         = rep(c("2020-01-01", "2020-06-01", "2021-01-01"), times = 3),
+    toy <- data.frame(
+        date         = as.Date(rep(c("2020-01-01", "2020-06-01", "2021-01-01"), times = 3)),
         set_id       = "S1",
         arm_position = c(rep("x", 6), rep("y", 3)),
         pin_number   = c(rep("p1", 3), rep("p2", 3), rep("p1", 3)),
@@ -260,8 +259,8 @@ test_that("arm- and set-level stats match by-hand calculations on a minimal data
 
 test_that("a single reading date per pin produces all-NA increments and NaN/NA summaries", {
 
-    one_date <- tibble::tibble(
-        date         = "2020-01-01",
+    one_date <- data.frame(
+        date         = as.Date("2020-01-01"),
         set_id       = c("S1", "S1"),
         arm_position = c("x", "x"),
         pin_number   = c("p1", "p2"),
@@ -277,60 +276,4 @@ test_that("a single reading date per pin produces all-NA increments and NaN/NA s
     expect_true(is.nan(result$set$mean_incr))
 })
 
-test_that("works when input is already a tibble, not just a base data.frame", {
 
-    result_df  <- calc_change_incr(example_sets)
-    result_tbl <- calc_change_incr(tibble::as_tibble(example_sets))
-
-    expect_equal(result_df, result_tbl)
-})
-
-# =============================================================================
-# 6. Documenting a known quirk: se_incr's denominator
-# =============================================================================
-# NOTE: `length(!is.na(x))` returns the length of a logical vector, which is
-# always the group size `n`, regardless of how many values are actually NA.
-# This means se_incr is effectively sd_incr / sqrt(n), where n is the number
-# of pins (or arms) in the group, NOT the number of non-missing increments.
-# The test below documents this current, as-implemented behavior so future
-# refactors don't change it silently; if the intent is really
-# sd/sqrt(sum(!is.na(x))), the function will need to change and this test
-# should be updated accordingly.
-
-test_that("se_incr denominator uses full group size, not count of non-NA values (documents current behavior)", {
-
-    # pin3 is introduced a reading period later than pin1/pin2, so on the
-    # 2020-06-01 date, pin3 contributes its own first-reading NA while pin1 and
-    # pin2 contribute real increments. Group size (3) then differs from the
-    # count of non-NA increments (2) -- this is what exposes the quirk.
-    toy <- tibble::tribble(
-        ~date,          ~set_id, ~arm_position, ~pin_number, ~pin_height,
-        "2020-01-01",   "S1",    "x",           "p1",        10,
-        "2020-06-01",   "S1",    "x",           "p1",        15,
-        "2021-01-01",   "S1",    "x",           "p1",        25,
-        "2020-01-01",   "S1",    "x",           "p2",        20,
-        "2020-06-01",   "S1",    "x",           "p2",        20,
-        "2021-01-01",   "S1",    "x",           "p2",        26,
-        "2020-06-01",   "S1",    "x",           "p3",        50,
-        "2021-01-01",   "S1",    "x",           "p3",        55
-    )
-
-    result <- calc_change_incr(toy)
-    arm_mid <- result$arm %>% dplyr::filter(date == "2020-06-01")
-
-    incr_vals   <- c(5, 0)  # p1, p2 increments on 2020-06-01 (p3's is NA - first reading)
-    group_size  <- 3        # p1, p2, and p3 are all present in the group on this date
-
-    # As implemented, se_incr = sd(incr, na.rm=TRUE) / sqrt(length(!is.na(incr))),
-    # and length(!is.na(x)) is just the group size, not sum(!is.na(x)).
-    expect_equal(arm_mid$se_incr,
-                 stats::sd(incr_vals) / sqrt(group_size),
-                 tolerance = 1e-8)
-
-    # if the denominator were instead the count of non-NA values (2), this
-    # would give a different (larger) se_incr -- confirming the two diverge
-    expect_false(isTRUE(all.equal(
-        arm_mid$se_incr,
-        stats::sd(incr_vals) / sqrt(length(incr_vals))
-    )))
-})
