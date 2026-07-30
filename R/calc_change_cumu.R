@@ -30,13 +30,13 @@ calc_change_cumu <- function(dat) {
         dplyr::group_by(.data$set_id, .data$arm_position, .data$pin_number) %>%
         dplyr::mutate(cumu = .data$pin_height - .data$pin_height[1]) %>%
         # mutate(cumu = pin_height - pin_height[min(which(!is.na(pin_height)))]) %>% ##### subtract off the first pin reading that's not NA
-        dplyr::select(-.data$pin_height) %>%
+        dplyr::select(-"pin_height") %>%
         dplyr::ungroup()
 
     # pins averaged up to arms
     change_cumu_arm <- change_cumu_pin %>%
         dplyr::group_by(.data$set_id, .data$arm_position, .data$date) %>%
-        dplyr::select(-.data$pin_number) %>%
+        dplyr::select(-"pin_number") %>%
         dplyr::summarize(mean_cumu = mean(.data$cumu, na.rm = TRUE),
                   sd_cumu = stats::sd(.data$cumu, na.rm = TRUE),
                   se_cumu = stats::sd(.data$cumu, na.rm = TRUE)/sqrt(sum(!is.na(.data$cumu)))) %>%
@@ -45,7 +45,7 @@ calc_change_cumu <- function(dat) {
     # arms averaged up to SETs
     change_cumu_set <- change_cumu_arm %>%
         dplyr::group_by(.data$set_id, .data$date) %>%
-        dplyr::select(-.data$arm_position, mean_value = .data$mean_cumu) %>%
+        dplyr::select(-"arm_position", mean_value = "mean_cumu") %>%
         dplyr::summarize(mean_cumu = mean(.data$mean_value, na.rm = TRUE),
                   sd_cumu = stats::sd(.data$mean_value, na.rm = TRUE),
                   se_cumu = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(sum(!is.na(.data$mean_value)))) %>%

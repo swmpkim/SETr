@@ -33,7 +33,7 @@ calc_change_incr <- function(data){
     # pins averaged up to arms
     change_incr_arm <- change_incr_pin %>%
         dplyr::group_by(.data$set_id, .data$arm_position, .data$date) %>%
-        dplyr::select(-.data$pin_number) %>%
+        dplyr::select(-"pin_number") %>%
         dplyr::summarize(mean_incr = mean(.data$incr, na.rm = TRUE),
                   sd_incr = stats::sd(.data$incr, na.rm = TRUE),
                   se_incr = stats::sd(.data$incr, na.rm = TRUE)/sqrt(sum(!is.na(.data$incr)))) %>%
@@ -42,7 +42,7 @@ calc_change_incr <- function(data){
     # arms averaged up to SETs
     change_incr_set <- change_incr_arm %>%
         dplyr::group_by(.data$set_id, .data$date) %>%
-        dplyr::select(-.data$arm_position, mean_value = .data$mean_incr) %>%
+        dplyr::select(-"arm_position", mean_value = "mean_incr") %>%
         dplyr::summarize(mean_incr = mean(.data$mean_value, na.rm = TRUE),
                   sd_incr = stats::sd(.data$mean_value, na.rm = TRUE),
                   se_incr = stats::sd(.data$mean_value, na.rm = TRUE)/sqrt(sum(!is.na(.data$mean_value)))) %>%
