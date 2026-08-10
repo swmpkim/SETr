@@ -1,0 +1,74 @@
+---
+title: "SETr"
+vignette: >
+  %\VignetteIndexEntry{SETr}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(SETr)
+```
+
+In this vignette, we will walk through how to use this package to write your own scripts for the import, analysis, and visualization of Surface Elevation Table (SET) data. The products from the original NERRS Science Collaborative-funded [SETr project](https://nerrssciencecollaborative.org/project/Cressman18) were designed for users who are not comfortable with R, and only want to have to hit a few buttons to run an entire workflow process. The current package is for people who *are* comfortable with R and want to modify or customize the outputs.  
+
+# 1. Import data  
+
+The assumed format is the wide NERRS format, where each row represents readings from one SET arm on a given reading date (for a typical SET with 4 arm positions, there will be 4 rows per date), with one column for each of the 9 pins' measurements, and one column for a QA/QC code per pin. See the [Analysis Tools and Workflow Guide](https://nerrssciencecollaborative.org/resource/setr-analysis-tools-and-workflow-guide) for more detail on this data format.  
+
+Insert screenshot of wide data  
+
+Make example of:  
+import_NERRwide()  
+
+Show what the imported data looks like (create example dataset if necessary)  
+
+# 2. Reshape data into long format  
+
+The functions used in SETr rely on a long data format: a single pin reading per row. The function `pivot_longer_SETs()` does this.  
+
+Create function  
+
+Show example using the wide example dataset from above  
+
+
+# 3. Graph raw data  
+
+Use this as a QA/QC step - make sure nothing looks wildly out of line with your expectations or your other data; if it does, go back to your field sheets and either verify or correct your spreadsheet.  
+
+plot_raw_pin()
+plot_raw_arm()  
+
+Possibly write functions for QA/QC graphs from the shiny app, allowing people to choose their threshold of concern  - plot_incr_pin and plot_incr_arm may be these; need to use calc_change_incr first
+
+
+# 4. Calculate and graph cumulative change (change since first reading)  
+
+These graphs should look the same as the raw readings, but with 0 at the bottom of the y-axis.  
+First we have to calculate cumulative change by subtracting the first reading at a pin from each subsequent reading:  
+
+calc_change_cumu  
+
+Then we can graph:  
+
+plot_cumu_pin - this doesn't seem to exist??
+plot_cumu_arm 
+plot_cumu_set  
+
+
+# 5. Calculate the rate of change through time  
+
+This step does not use functions from the SETr package, but rather from your favorite way to model data.  
+
+
+# 6. Graph change through time  
+
+## Sea level rise rates  
+
+
+# 7. Map  

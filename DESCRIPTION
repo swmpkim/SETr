@@ -24,6 +24,11 @@ Imports:
     rlang,
     stats,
     readxl,
-    purrr
+    purrr,
+    tidyr,
+    tidyselect
 Suggests: 
+    knitr,
+    quarto,
     testthat (>= 2.1.0)
+VignetteBuilder: quarto
