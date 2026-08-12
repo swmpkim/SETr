@@ -9,7 +9,7 @@
 #'   \code{pin_<number>_qaqc_code}.
 #'
 #' @return A long-format data frame with one row per pin per original row,
-#'   including a \code{pin} column, a \code{height_mm} or \code{height_cm}
+#'   including a \code{pin_number} column, a \code{height_mm} or \code{height_cm}
 #'   column (matching the unit used in \code{data}), and a \code{qaqc_code}
 #'   column.
 #'
@@ -24,7 +24,7 @@ pivot_NERRwide <- function(data) {
         dplyr::select(-tidyselect::matches("^pin_\\d+_qaqc_code")) |>
         tidyr::pivot_longer(
             cols = tidyselect::matches("^pin_\\d+_height"),
-            names_to = c("pin", ".value"),
+            names_to = c("pin_number", ".value"),
             names_pattern = "pin_(\\d+)_(height_.*)"
         )
 
@@ -32,7 +32,7 @@ pivot_NERRwide <- function(data) {
         dplyr::select(-tidyselect::matches("^pin_\\d+_height")) |>
         tidyr::pivot_longer(
             cols = tidyselect::matches("^pin_\\d+_qaqc_code"),
-            names_to = "pin",
+            names_to = "pin_number",
             names_pattern = "pin_(\\d+)_qaqc_code",
             values_to = "qaqc_code"
         )

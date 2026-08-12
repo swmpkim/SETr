@@ -24,13 +24,13 @@ The assumed format is the wide NERRS format, where each row represents readings 
 Insert screenshot of wide data  
 
 Make example of:  
-import_NERRwide()  
+`import_NERRwide()`  
 
 Show what the imported data looks like (create example dataset if necessary)  
 
 # 2. Reshape data into long format  
 
-The functions used in SETr rely on a long data format: a single pin reading per row. The function `pivot_longer_SETs()` does this.  
+The functions used in SETr rely on a long data format: a single pin reading per row. The function `pivot_NERRwide()` does this.  
 
 Create function  
 
@@ -41,8 +41,19 @@ Show example using the wide example dataset from above
 
 Use this as a QA/QC step - make sure nothing looks wildly out of line with your expectations or your other data; if it does, go back to your field sheets and either verify or correct your spreadsheet.  
 
-plot_raw_pin()
-plot_raw_arm()  
+plot_raw_pin() - one SET at a time; yields one facet per arm position.  
+
+```{r}
+plot_raw_pin(example_sets, "SET1")
+```
+
+
+plot_raw_arm()  - all SETs in the data; one facet per SET, with each arm represented as a different color.  
+
+```{r}
+plot_raw_arm(example_sets)
+```
+
 
 Possibly write functions for QA/QC graphs from the shiny app, allowing people to choose their threshold of concern  - plot_incr_pin and plot_incr_arm may be these; need to use calc_change_incr first
 
