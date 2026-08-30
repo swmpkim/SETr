@@ -2,6 +2,7 @@
 
 export(calc_change_cumu)
 export(calc_change_incr)
+export(exclude_qaqc)
 export(height_to_mm)
 export(import_NERRwide)
 export(pivot_NERRwide)
@@ -14,4 +15,5 @@ export(plot_rate_comps)
 export(plot_raw_arm)
 export(plot_raw_pin)
 importFrom(rlang,"!!")
+importFrom(rlang,":=")
 importFrom(rlang,.data)

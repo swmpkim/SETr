@@ -18,7 +18,8 @@ plot_rate_comps(
   comp2 = NULL,
   comp2_ci_low = NULL,
   comp2_ci_high = NULL,
-  veg
+  veg,
+  veg_palette = "auto"
 )
 }
 \arguments{
@@ -53,6 +54,15 @@ plot_rate_comps(
 \item{comp2_ci_high}{optional; a single number representing the upper limit of the 95\% confidence interval for the point estimate `comp2`}
 
 \item{veg}{column or vector containing names of the dominant vegetation type at each SET}
+
+\item{veg_palette}{Palette used to color points by `veg` when `color_by_veg = TRUE`.
+Default `"auto"` uses the ColorBrewer `"Dark2"` qualitative palette (its usual
+look) when there are 8 or fewer distinct vegetation categories in the data, and
+automatically switches to a `viridis` scale -- which supports any number of
+categories -- when there are more than 8. Set this to the name of any
+RColorBrewer qualitative palette (e.g. `"Set1"`, `"Paired"`, `"Accent"`) to use
+that one instead, or to `"viridis"` to force the viridis scale regardless of
+category count.}
 }
 \value{
 a ggplot object
@@ -99,4 +109,37 @@ plot_rate_comps(data = example_rates,
                 comp2 = 5.5,
                 comp2_ci_low = 5.0,
                 comp2_ci_high = 6.0)
+
+# more than 8 vegetation categories -- veg_palette = "auto" (the default)
+# switches to a viridis scale automatically instead of running out of Dark2 colors
+example_rates_many_veg <- data.frame(
+    "set_id" = paste0("SET", 1:10),
+    "set_rate" = seq(2, 6, length.out = 10),
+    "ci_low" = seq(1.8, 5.8, length.out = 10),
+    "ci_high" = seq(2.2, 6.2, length.out = 10),
+    "veg" = paste0("Species", 1:10))
+
+plot_rate_comps(data = example_rates_many_veg,
+                set_ids = set_id,
+                color_by_veg = TRUE,
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7,
+                veg = veg)
+
+# override the default palette with a different RColorBrewer qualitative palette
+plot_rate_comps(data = example_rates,
+                set_ids = set_id,
+                color_by_veg = TRUE,
+                veg_palette = "Set1",
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7,
+                veg = veg)
 }

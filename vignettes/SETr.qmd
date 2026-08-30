@@ -58,7 +58,32 @@ plot_raw_arm(example_sets)
 Possibly write functions for QA/QC graphs from the shiny app, allowing people to choose their threshold of concern  - plot_incr_pin and plot_incr_arm may be these; need to use calc_change_incr first
 
 
-# 4. Calculate and graph cumulative change (change since first reading)  
+## Excluding flagged readings
+
+During data collection, individual pin readings are sometimes flagged with a QA/QC code (e.g. because a crab burrow or standing water made the surface hard to read accurately). `exclude_qaqc()` sets `pin_height` to `NA` for any reading whose QAQC code matches one you specify, so those readings drop out of downstream calculations without having to manually filter rows yourself. Matching is an exact, case-sensitive match against the QAQC code column.
+
+```{r}
+# example_sets doesn't ship with a qaqc_code column, so add one for
+# demonstration -- flag one reading with a made-up "CB" (crab burrow) code
+dat_qaqc <- example_sets
+dat_qaqc$qaqc_code <- "OK"
+dat_qaqc$qaqc_code[3] <- "CB"
+
+exclude_qaqc(dat_qaqc, codes = "CB")
+```
+
+If you also have an arm-level QAQC column to check, call `exclude_qaqc()` again pointing at it (e.g. `qaqc_code = arm_qaqc_code`). This chains naturally into the rest of the import/pivot workflow:
+
+```r
+import_NERRwide("path/to/file.xlsx") |>
+    pivot_NERRwide() |>
+    height_to_mm() |>
+    exclude_qaqc(codes = c("CB", "DR")) |>
+    calc_change_cumu()
+```
+
+
+# 4. Calculate and graph cumulative change (change since first reading)
 
 These graphs should look the same as the raw readings, but with 0 at the bottom of the y-axis.  
 First we have to calculate cumulative change by subtracting the first reading at a pin from each subsequent reading:  
