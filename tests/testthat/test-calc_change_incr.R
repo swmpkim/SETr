@@ -73,8 +73,8 @@ test_that("arm tibble has one row per set-arm-date combination", {
 
     result <- calc_change_incr(example_sets)
 
-    expected_rows <- example_sets %>%
-        dplyr::distinct(set_id, arm_position, date) %>%
+    expected_rows <- example_sets |>
+        dplyr::distinct(set_id, arm_position, date) |>
         nrow()
 
     expect_equal(nrow(result$arm), expected_rows)
@@ -87,8 +87,8 @@ test_that("set tibble has one row per set-date combination", {
 
     result <- calc_change_incr(example_sets)
 
-    expected_rows <- example_sets %>%
-        dplyr::distinct(set_id, date) %>%
+    expected_rows <- example_sets |>
+        dplyr::distinct(set_id, date) |>
         nrow()
 
     expect_equal(nrow(result$set), expected_rows)
@@ -105,9 +105,9 @@ test_that("pin-level incr is NA on the first date for every pin", {
 
     result <- calc_change_incr(example_sets)
 
-    first_date_rows <- result$pin %>%
-        dplyr::group_by(set_id, arm_position, pin_number) %>%
-        dplyr::filter(date == min(date)) %>%
+    first_date_rows <- result$pin |>
+        dplyr::group_by(set_id, arm_position, pin_number) |>
+        dplyr::filter(date == min(date)) |>
         dplyr::ungroup()
 
     expect_true(all(is.na(first_date_rows$incr)))
@@ -117,21 +117,21 @@ test_that("pin-level incr matches hand-calculated differences (SET1, arm a)", {
 
     result <- calc_change_incr(example_sets)
 
-    pin1 <- result$pin %>%
-        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_1") %>%
+    pin1 <- result$pin |>
+        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_1") |>
         dplyr::arrange(date)
 
     expect_equal(pin1$pin_height, c(100, 105, 112))
     expect_equal(pin1$incr, c(NA, 5, 7))
 
-    pin2 <- result$pin %>%
-        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_2") %>%
+    pin2 <- result$pin |>
+        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_2") |>
         dplyr::arrange(date)
 
     expect_equal(pin2$incr, c(NA, 7, 7))
 
-    pin3 <- result$pin %>%
-        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_3") %>%
+    pin3 <- result$pin |>
+        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_3") |>
         dplyr::arrange(date)
 
     expect_equal(pin3$incr, c(NA, 2, 4))
@@ -142,13 +142,13 @@ test_that("pin-level calculations do not mix across set_id, arm_position, or pin
     # SET1 arm b, pin_1 has a completely different trajectory than SET1 arm a, pin_1
     result <- calc_change_incr(example_sets)
 
-    set1_a_pin1 <- result$pin %>%
-        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_1") %>%
-        dplyr::arrange(date) %>% dplyr::pull(incr)
+    set1_a_pin1 <- result$pin |>
+        dplyr::filter(set_id == "SET1", arm_position == "a", pin_number == "pin_1") |>
+        dplyr::arrange(date) |> dplyr::pull(incr)
 
-    set1_b_pin1 <- result$pin %>%
-        dplyr::filter(set_id == "SET1", arm_position == "b", pin_number == "pin_1") %>%
-        dplyr::arrange(date) %>% dplyr::pull(incr)
+    set1_b_pin1 <- result$pin |>
+        dplyr::filter(set_id == "SET1", arm_position == "b", pin_number == "pin_1") |>
+        dplyr::arrange(date) |> dplyr::pull(incr)
 
     expect_false(isTRUE(all.equal(set1_a_pin1, set1_b_pin1)))
 })
@@ -161,8 +161,8 @@ test_that("arm-level mean/sd/se match hand-calculated values (SET1, arm a)", {
 
     result <- calc_change_incr(example_sets)
 
-    arm_a <- result$arm %>%
-        dplyr::filter(set_id == "SET1", arm_position == "a") %>%
+    arm_a <- result$arm |>
+        dplyr::filter(set_id == "SET1", arm_position == "a") |>
         dplyr::arrange(date)
 
     # first date: all pin increments are NA -> mean is NaN, sd/se are NA
@@ -185,8 +185,8 @@ test_that("set-level mean/sd/se match hand-calculated values (SET1)", {
 
     result <- calc_change_incr(example_sets)
 
-    set1 <- result$set %>%
-        dplyr::filter(set_id == "SET1") %>%
+    set1 <- result$set |>
+        dplyr::filter(set_id == "SET1") |>
         dplyr::arrange(date)
 
     expect_true(is.nan(set1$mean_incr[1]))
@@ -204,20 +204,20 @@ test_that("set_id groups are aggregated independently at the arm and set level",
 
     result <- calc_change_incr(example_sets)
 
-    set1_arm <- result$arm %>% dplyr::filter(set_id == "SET1") %>%
-        dplyr::arrange(arm_position, date) %>% dplyr::select(-set_id)
-    set2_arm <- result$arm %>% dplyr::filter(set_id == "SET2") %>%
-        dplyr::arrange(arm_position, date) %>% dplyr::select(-set_id)
+    set1_arm <- result$arm |> dplyr::filter(set_id == "SET1") |>
+        dplyr::arrange(arm_position, date) |> dplyr::select(-set_id)
+    set2_arm <- result$arm |> dplyr::filter(set_id == "SET2") |>
+        dplyr::arrange(arm_position, date) |> dplyr::select(-set_id)
 
     # By construction, example_sets has SET2 = SET1 + 42 at every pin, so
     # increments (and therefore arm/set summaries) should be identical even
     # though the raw pin heights are not.
     expect_equal(set1_arm, set2_arm)
 
-    raw1 <- example_sets %>% dplyr::filter(set_id == "SET1") %>%
-        dplyr::arrange(arm_position, pin_number, date) %>% dplyr::pull(pin_height)
-    raw2 <- example_sets %>% dplyr::filter(set_id == "SET2") %>%
-        dplyr::arrange(arm_position, pin_number, date) %>% dplyr::pull(pin_height)
+    raw1 <- example_sets |> dplyr::filter(set_id == "SET1") |>
+        dplyr::arrange(arm_position, pin_number, date) |> dplyr::pull(pin_height)
+    raw2 <- example_sets |> dplyr::filter(set_id == "SET2") |>
+        dplyr::arrange(arm_position, pin_number, date) |> dplyr::pull(pin_height)
 
     expect_false(isTRUE(all.equal(raw1, raw2)))
 })
@@ -240,17 +240,17 @@ test_that("arm- and set-level stats match by-hand calculations on a minimal data
 
     result <- calc_change_incr(toy)
 
-    arm_x <- result$arm %>% dplyr::filter(arm_position == "x") %>% dplyr::arrange(date)
+    arm_x <- result$arm |> dplyr::filter(arm_position == "x") |> dplyr::arrange(date)
     expect_equal(arm_x$mean_incr, c(NaN, 2.5, 8))
     expect_equal(arm_x$sd_incr[2], stats::sd(c(5, 0)), tolerance = 1e-8)
     expect_equal(arm_x$sd_incr[3], stats::sd(c(10, 6)), tolerance = 1e-8)
 
-    arm_y <- result$arm %>% dplyr::filter(arm_position == "y") %>% dplyr::arrange(date)
+    arm_y <- result$arm |> dplyr::filter(arm_position == "y") |> dplyr::arrange(date)
     expect_equal(arm_y$mean_incr, c(NaN, 2, 2))
     # only one pin in arm y -> sd of a single value is NA
     expect_true(all(is.na(arm_y$sd_incr[2:3])))
 
-    set_lvl <- result$set %>% dplyr::arrange(date)
+    set_lvl <- result$set |> dplyr::arrange(date)
     # date 2: arm means feeding in are 2.5 (x) and 2 (y) -> set mean = 2.25
     expect_equal(set_lvl$mean_incr[2], 2.25, tolerance = 1e-8)
     # date 3: arm means feeding in are 8 (x) and 2 (y) -> set mean = 5
@@ -274,6 +274,29 @@ test_that("a single reading date per pin produces all-NA increments and NaN/NA s
     expect_true(is.na(result$arm$sd_incr))
     expect_true(is.na(result$arm$se_incr))
     expect_true(is.nan(result$set$mean_incr))
+})
+
+# =============================================================================
+# 6. Custom column names (generalization)
+# =============================================================================
+
+test_that("custom column names produce the same results as the defaults", {
+    dat <- example_sets |>
+        dplyr::rename(reading_date = date, elevation = pin_height)
+
+    res_custom <- calc_change_incr(dat, date = reading_date, pin_height = elevation)
+    res_default <- calc_change_incr(example_sets)
+
+    expect_true(all(c("date", "set_id", "arm_position", "pin_number",
+                      "pin_height", "incr") %in% names(res_custom$pin)))
+    expect_equal(res_custom$pin$incr, res_default$pin$incr)
+    expect_equal(res_custom$arm, res_default$arm)
+    expect_equal(res_custom$set, res_default$set)
+})
+
+test_that("missing-column error message reflects the custom name that was requested", {
+    dat <- example_sets |> dplyr::rename(elevation = pin_height)
+    expect_error(calc_change_incr(dat, pin_height = elevation_mm), "elevation_mm")
 })
 
 

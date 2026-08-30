@@ -6,6 +6,9 @@
 \usage{
 plot_cumu_set(
   data,
+  date = date,
+  set_id = set_id,
+  mean_cumu = mean_cumu,
   columns = 4,
   pointsize = 3.5,
   scales = "fixed",
@@ -14,7 +17,9 @@ plot_cumu_set(
 )
 }
 \arguments{
-\item{data}{data frame (e.g. `$set` piece of output from `calc_change_cumu()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, mean_cumu. `mean_cumu` should be an already-calculated field of change since baseline.}
+\item{data}{data frame (e.g. `$set` piece of output from `calc_change_cumu()`) with one row per faceting variable. `mean_cumu` should be an already-calculated field of change since baseline.}
+
+\item{date, set_id, mean_cumu}{unquoted column names in `data`. Default to `date`, `set_id`, `mean_cumu` -- the names used by `calc_change_cumu()`'s output; override if your data uses different names.}
 
 \item{columns}{number of columns you want in the faceted output}
 

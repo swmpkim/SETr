@@ -4,10 +4,19 @@
 \alias{calc_change_cumu}
 \title{Calculate Cumulative Change at a SET}
 \usage{
-calc_change_cumu(dat)
+calc_change_cumu(
+  data,
+  date = date,
+  set_id = set_id,
+  arm_position = arm_position,
+  pin_number = pin_number,
+  pin_height = pin_height
+)
 }
 \arguments{
-\item{dat}{a data frame with one row per pin reading, and the following columns, named exactly: date, set_id, arm_position, pin_number, pin_height}
+\item{data}{a data frame with one row per pin reading}
+
+\item{date, set_id, arm_position, pin_number, pin_height}{unquoted column names in `data`. Default to `date`, `set_id`, `arm_position`, `pin_number`, `pin_height`; override if your data uses different names. Internally, columns are renamed to these canonical names before calculating, so the output's column names are unaffected by this argument.}
 }
 \value{
 a list of three tibbles: one each for pin, arm, and set level calculations. Pin level change is calculated first, as the difference between a pin reading and the reading from the earliest date at that set_id--arm--pin. If the first reading was NA, the entire pin's cumulative readings will be NA. The column name in the $pin tibble is "cumu". For every date of a pin reading, this calculated value will exist. On the first date, it is 0. Cumulative pin changes are then averaged to the arm position level on each date, excluding NAs. St Deviation and St Error are also calculated. There is one calculated value for every arm on every reading date. These columns in the $arm tibble are "mean_cumu", "sd_cumu", and "se_cumu". The cumulative arm changes are then averaged to the SET level, also with st dev and st err. There is one calculated value for every SET on every reading date. The columns in the $set tibble are again "mean_cumu", "sd_cumu", and "se_cumu".
@@ -17,5 +26,10 @@ Calculate Cumulative Change at a SET
 }
 \examples{
 calc_change_cumu(example_sets)
+
+# using data with non-default column names
+renamed <- example_sets |>
+    dplyr::rename(reading_date = date, elevation_mm = pin_height)
+calc_change_cumu(renamed, date = reading_date, pin_height = elevation_mm)
 
 }

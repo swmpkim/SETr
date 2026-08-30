@@ -7,6 +7,10 @@
 plot_incr_arm(
   data,
   set = NULL,
+  date = date,
+  set_id = set_id,
+  arm_position = arm_position,
+  mean_incr = mean_incr,
   threshold = 25,
   columns = 4,
   pointsize = 2,
@@ -14,9 +18,11 @@ plot_incr_arm(
 )
 }
 \arguments{
-\item{data}{data frame (e.g. `$arm` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, mean_incr. `mean_incr` should be an already-calculated field of change since previous reading}
+\item{data}{data frame (e.g. `$arm` piece of output from `calc_change_incr()`) with one row per faceting variable. `mean_incr` should be an already-calculated field of change since previous reading.}
 
 \item{set}{optional SET ID if you only want to look at one SET; default is to graph all SETs}
+
+\item{date, set_id, arm_position, mean_incr}{unquoted column names in `data`. Default to `date`, `set_id`, `arm_position`, `mean_incr` -- the names used by `calc_change_incr()`'s output; override if your data uses different names.}
 
 \item{threshold}{numeric value for red horizontal lines (at +/- this value); this should be a value that would be a meaningful threshold for incremental change.}
 

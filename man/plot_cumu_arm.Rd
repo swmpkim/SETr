@@ -4,10 +4,21 @@
 \alias{plot_cumu_arm}
 \title{Make a graph of change over time by arm position}
 \usage{
-plot_cumu_arm(data, columns = 4, pointsize = 2, scales = "fixed")
+plot_cumu_arm(
+  data,
+  date = date,
+  set_id = set_id,
+  arm_position = arm_position,
+  mean_cumu = mean_cumu,
+  columns = 4,
+  pointsize = 2,
+  scales = "fixed"
+)
 }
 \arguments{
-\item{data}{data frame (e.g. `$arm` piece of output from `calc_change_cumu()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, mean_cumu. `mean_cumu` should be an already-calculated field of change since baseline.}
+\item{data}{data frame (e.g. `$arm` piece of output from `calc_change_cumu()`) with one row per faceting variable. `mean_cumu` should be an already-calculated field of change since baseline.}
+
+\item{date, set_id, arm_position, mean_cumu}{unquoted column names in `data`. Default to `date`, `set_id`, `arm_position`, `mean_cumu` -- the names used by `calc_change_cumu()`'s output; override if your data uses different names.}
 
 \item{columns}{number of columns you want in the faceted output}
 
