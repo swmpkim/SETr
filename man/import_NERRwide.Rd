@@ -15,24 +15,19 @@ that shouldn't be imported (e.g. a README or metadata sheet).}
 }
 \value{
 A data frame combining all specified sheets, with `set_id`,
-  `arm_position`, and any column ending in `qaqc_code` coerced to
-  character. The temporary `sheet` column (used to identify sheet origin
-  during the mismatch check) is dropped from the final output.
+  `arm_position`, and any pin QAQC column (matching `pin_<n>_qaqc`, the
+  current convention, or the legacy `pin_<n>_qaqc_code`) coerced to
+  character, and any pin height column (matching `pin_<n>_height_<unit>`)
+  coerced to numeric. The temporary `sheet` column (used to identify sheet
+  origin during the mismatch check) is dropped from the final output. If
+  `year`, `month`, and `day` columns are all present and there is not
+  already a `date` column, a `date` column is added by combining them.
 }
 \description{
 Reads one or more sheets from a NERR-formatted Excel file, row-binds them
 into a single data frame, and verifies that the `set_id` column in each
 sheet matches the name of the sheet it came from. If any mismatches are
 found, the function stops and prints the offending rows for review.
-
-TODO: expand on what "NERR wide" data represents, and any assumptions
-about file/sheet structure (e.g. required columns, expected sheet naming
-convention like "SITE-#").
-}
-\details{
-TODO: note any expectations about column names/types across sheets
-(e.g. `set_id`, `year`, `month`, `arm_position` must exist in every sheet),
-and what happens if sheets have inconsistent columns.
 }
 \section{Errors}{
 
@@ -42,12 +37,12 @@ name, printing the mismatched rows (`sheet`, `set_id`, `year`, `month`,
 }
 
 \examples{
-\dontrun{
+wide_file <- system.file("extdata", "example_wide.xlsx", package = "SETr")
+
 # Read all sheets
-dat <- import_NERRwide("path/to/file.xlsx")
+dat <- import_NERRwide(wide_file)
 
 # Read only specific sheets
-dat <- import_NERRwide("path/to/file.xlsx", sheets = c("CLMAJ-1", "CLMAJ-2"))
-}
+dat <- import_NERRwide(wide_file, sheets = c("CLMAJ-1", "SPALT-1"))
 
 }

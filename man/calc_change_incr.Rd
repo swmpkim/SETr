@@ -4,10 +4,19 @@
 \alias{calc_change_incr}
 \title{Incremental Change Calculations}
 \usage{
-calc_change_incr(data)
+calc_change_incr(
+  data,
+  date = date,
+  set_id = set_id,
+  arm_position = arm_position,
+  pin_number = pin_number,
+  pin_height = pin_height
+)
 }
 \arguments{
-\item{data}{a data frame with one row per pin reading, and the following columns, named exactly: date, set_id, arm_position, pin_number, pin_height}
+\item{data}{a data frame with one row per pin reading}
+
+\item{date, set_id, arm_position, pin_number, pin_height}{unquoted column names in `data`. Default to `date`, `set_id`, `arm_position`, `pin_number`, `pin_height`; override if your data uses different names. Internally, columns are renamed to these canonical names before calculating, so the output's column names are unaffected by this argument.}
 }
 \value{
 a list of three tibbles: one each for pin, arm, and set level calculations. Pin level change is calculated first, as the difference between a pin reading and the prior pin reading from that set_id--arm--pin. The column name in the $pin tibble is "incr". For every date of a pin reading, this calculated value will exist or be NA. On the first date, it is NA. Incremental pin changes are then averaged to the arm position level on each date, excluding NAs. St Deviation and St Error are also calculated. There is one calculated value for every arm on every reading date. These columns in the $arm tibble are "mean_incr", "sd_incr", and "se_incr". The cumulative arm changes are then averaged to the SET level, also with st dev and st err. There is one calculated value for every SET on every reading date. The columns in the $set tibble are again "mean_incr", "sd_incr", and "se_incr". Pin level calculations are the most helpful for qa/qc, as it is possible to check for and follow-up on readings that have changed more than a certain amount (e.g. 25 mm) between readings.
@@ -17,4 +26,9 @@ Incremental Change Calculations
 }
 \examples{
 calc_change_incr(example_sets)
+
+# using data with non-default column names
+renamed <- example_sets |>
+    dplyr::rename(reading_date = date, elevation_mm = pin_height)
+calc_change_incr(renamed, date = reading_date, pin_height = elevation_mm)
 }

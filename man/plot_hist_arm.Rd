@@ -4,10 +4,19 @@
 \alias{plot_hist_arm}
 \title{Generate a histogram of pin readings by arm position}
 \usage{
-plot_hist_arm(data, columns = 4, scales = "free_y")
+plot_hist_arm(
+  data,
+  set_id = set_id,
+  arm_position = arm_position,
+  pin_height = pin_height,
+  columns = 4,
+  scales = "free_y"
+)
 }
 \arguments{
-\item{data}{a data frame with one row per pin reading, and the following columns, named exactly: set_id, arm_position, pin_height}
+\item{data}{a data frame with one row per pin reading}
+
+\item{set_id, arm_position, pin_height}{unquoted column names in `data` for SET ID, arm position, and pin height, respectively. Default to `set_id`, `arm_position`, `pin_height`; override if your data uses different names.}
 
 \item{columns}{number of columns you'd like in the faceted plot}
 

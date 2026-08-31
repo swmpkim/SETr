@@ -7,6 +7,14 @@
 #' 3 = CIs for both SETs and SLR
 #' 4 = all of the above, plus a second comparison point and CIs
 #' @param color_by_veg TRUE or FALSE (the default), for whether the points representing SET elevation change rates should be colored according to dominant vegetation at or around the station (if TRUE, the dominant vegetation must be in a column identified by the `veg` argument of this function)
+#' @param veg_palette Palette used to color points by `veg` when `color_by_veg = TRUE`.
+#'   Default `"auto"` uses the ColorBrewer `"Dark2"` qualitative palette (its usual
+#'   look) when there are 8 or fewer distinct vegetation categories in the data, and
+#'   automatically switches to a `viridis` scale -- which supports any number of
+#'   categories -- when there are more than 8. Set this to the name of any
+#'   RColorBrewer qualitative palette (e.g. `"Set1"`, `"Paired"`, `"Accent"`) to use
+#'   that one instead, or to `"viridis"` to force the viridis scale regardless of
+#'   category count.
 #' @param set_ids column or vector containing unique SET IDs or names
 #' @param set_ci_low column or vector of numbers representing the lower limit of the 95\% confidence interval for the SET's rate of elevation change
 #' @param set_ci_high column or vector of numbers representing the upper limit of the 95\% confidence interval for the SET's rate of elevation change
@@ -61,6 +69,39 @@
 #'                 comp2 = 5.5,
 #'                 comp2_ci_low = 5.0,
 #'                 comp2_ci_high = 6.0)
+#'
+#' # more than 8 vegetation categories -- veg_palette = "auto" (the default)
+#' # switches to a viridis scale automatically instead of running out of Dark2 colors
+#' example_rates_many_veg <- data.frame(
+#'     "set_id" = paste0("SET", 1:10),
+#'     "set_rate" = seq(2, 6, length.out = 10),
+#'     "ci_low" = seq(1.8, 5.8, length.out = 10),
+#'     "ci_high" = seq(2.2, 6.2, length.out = 10),
+#'     "veg" = paste0("Species", 1:10))
+#'
+#' plot_rate_comps(data = example_rates_many_veg,
+#'                 set_ids = set_id,
+#'                 color_by_veg = TRUE,
+#'                 set_ci_low = ci_low,
+#'                 set_ci_high = ci_high,
+#'                 rates = set_rate,
+#'                 comp1 = 3.5,
+#'                 comp1_ci_low = 3.3,
+#'                 comp1_ci_high = 3.7,
+#'                 veg = veg)
+#'
+#' # override the default palette with a different RColorBrewer qualitative palette
+#' plot_rate_comps(data = example_rates,
+#'                 set_ids = set_id,
+#'                 color_by_veg = TRUE,
+#'                 veg_palette = "Set1",
+#'                 set_ci_low = ci_low,
+#'                 set_ci_high = ci_high,
+#'                 rates = set_rate,
+#'                 comp1 = 3.5,
+#'                 comp1_ci_low = 3.3,
+#'                 comp1_ci_high = 3.7,
+#'                 veg = veg)
 
 
 plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
@@ -68,7 +109,7 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
                             rates,
                             comp1, comp1_ci_low, comp1_ci_high,
                             comp2 = NULL, comp2_ci_low = NULL, comp2_ci_high = NULL,
-                            veg){
+                            veg, veg_palette = "auto"){
 
     # plot_type: 1 = basic; points only; no confidence intervals
     #            2 = CIs for SET rates, but not sea level rise (SLR)
@@ -84,31 +125,31 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
 
     # assemble the base plot, with axes and lines for 0 and SLR
     #####################################################################
-    p <- ggplot() +
-        geom_blank(data = data,
-                   aes(x = {{rates}},
+    p <- ggplot2::ggplot() +
+        ggplot2::geom_blank(data = data,
+                   ggplot2::aes(x = {{rates}},
                        y = {{set_ids}})) +
-        geom_vline(aes(xintercept = {{comp1}}),
+        ggplot2::geom_vline(ggplot2::aes(xintercept = {{comp1}}),
                    col = "navyblue",
-                   size = 1,
+                   linewidth = 1,
                    alpha = 0.9) +
-        geom_vline(aes(xintercept = 0),
+        ggplot2::geom_vline(ggplot2::aes(xintercept = 0),
                    col = "gray70") +
-        theme_classic()
+        ggplot2::theme_classic()
 
 
     # assemble each piece
     #####################################################################
 
     # points, not colored by veg
-    points_same <- geom_point(data = data,
-                              aes(x = {{rates}},
+    points_same <- ggplot2::geom_point(data = data,
+                              ggplot2::aes(x = {{rates}},
                                   y = {{set_ids}}),
                               size = 3,
                               col = "red3")
 
     # labels, when CIs are included for both SETs and SLR
-    labels_set_slr <- labs(title = "Elevation Change with 95% Confidence Intervals",
+    labels_set_slr <- ggplot2::labs(title = "Elevation Change with 95% Confidence Intervals",
                            subtitle = paste0("Local, long-term SLR in blue: ",
                                              {{comp1}}, " +/- ",
                                              comp1_ci_halfwidth, " mm/yr"),
@@ -116,7 +157,7 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
                            y = "SET")
 
     # labels when SETs, SLR, and 19-year change are included
-    labels_all <- labs(title = "Elevation Change with 95% Confidence Intervals",
+    labels_all <- ggplot2::labs(title = "Elevation Change with 95% Confidence Intervals",
                        subtitle = paste0("Long-term SLR, solid line & dark shading: ",
                                          {{comp1}}, " +/- ",
                                          comp1_ci_halfwidth, " mm/yr",
@@ -127,27 +168,28 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
                        y = "SET")
 
     # labels, when no CIs are included
-    labels_minimal <- labs(title = "Elevation Change",
+    labels_minimal <- ggplot2::labs(title = "Elevation Change",
                            subtitle = paste0("Local SLR in blue: ", {{comp1}}, " mm/yr"),
                            x = "Rate of change (mm/yr)",
                            y = "SET")
 
     # labels, when CIs are included for SETs but not SLR
-    labels_partial_setci <- labs(title = "Elevation Change with 95% Confidence Intervals",
+    labels_partial_setci <- ggplot2::labs(title = "Elevation Change with 95% Confidence Intervals",
                                  subtitle = paste0("Local SLR in blue: ", {{comp1}}, " mm/yr"),
                                  x = "Rate of change (mm/yr)",
                                  y = "SET")
 
     # geom to include when CIs are included for SETs
-    set_cis <- geom_errorbarh(data = data,
-                              aes(y = {{set_ids}},
+    set_cis <- ggplot2::geom_errorbar(data = data,
+                              ggplot2::aes(y = {{set_ids}},
                                   xmin = {{set_ci_low}},
                                   xmax = {{set_ci_high}}),
+                              orientation = "y",
                               col = "gray55",
-                              size = 1)
+                              linewidth = 1)
 
     # geom to include when CI is included for SLR
-    slr_cis <- geom_rect(aes(ymin = -Inf,
+    slr_cis <- ggplot2::geom_rect(ggplot2::aes(ymin = -Inf,
                              ymax = Inf,
                              xmin = {{comp1_ci_low}},
                              xmax = {{comp1_ci_high}}),
@@ -155,14 +197,14 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
                          alpha = 0.2)
 
     # geom to include with point estimate for comp2
-    comp2_line <- geom_vline(aes(xintercept = {{comp2}}),
+    comp2_line <- ggplot2::geom_vline(ggplot2::aes(xintercept = {{comp2}}),
                              col = "navyblue",
-                             size = 1,
+                             linewidth = 1,
                              linetype = "dashed",
                              alpha = 0.9)
 
     # geom to include when point and CI included for comp2
-    comp2_cis <- geom_rect(aes(ymin = -Inf,
+    comp2_cis <- ggplot2::geom_rect(ggplot2::aes(ymin = -Inf,
                                ymax = Inf,
                                xmin = {{comp2_ci_low}},
                                xmax = {{comp2_ci_high}}),
@@ -174,13 +216,28 @@ plot_rate_comps <- function(data, plot_type = 3, color_by_veg = FALSE,
     if(color_by_veg){
         # the veg column has to be defined
         # this doesn't work though: stopifnot(exists({{veg}}, data))
-        points_veg <- geom_point(data = data,
-                                 aes(x = {{rates}},
+        points_veg <- ggplot2::geom_point(data = data,
+                                 ggplot2::aes(x = {{rates}},
                                      y = {{set_ids}},
                                      col = {{veg}}),
                                  size = 3)
-        colors_veg <- scale_color_brewer(type = "qual", palette = "Dark2")
-        labels_veg <- labs(color = "Dominant Vegetation")
+
+        # Dark2 (the default qualitative palette) tops out at 8 colors; when left
+        # on "auto", fall back to viridis for larger category counts so extra
+        # categories don't end up uncolored (NA/grey) instead of erroring
+        palette_choice <- veg_palette
+        if (identical(palette_choice, "auto")) {
+            n_veg <- length(unique(dplyr::pull(data, {{veg}})))
+            palette_choice <- if (n_veg <= 8) "Dark2" else "viridis"
+        }
+
+        colors_veg <- if (identical(palette_choice, "viridis")) {
+            ggplot2::scale_color_viridis_d()
+        } else {
+            ggplot2::scale_color_brewer(type = "qual", palette = palette_choice)
+        }
+
+        labels_veg <- ggplot2::labs(color = "Dominant Vegetation")
     }
 
 

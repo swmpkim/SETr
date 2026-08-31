@@ -8,17 +8,24 @@ pivot_NERRwide(data)
 }
 \arguments{
 \item{data}{A data frame produced by \code{import_NERRwide()}, containing
-columns matching \code{pin_<number>_height_<unit>} and
-\code{pin_<number>_qaqc_code}.}
+columns matching \code{pin_<number>_height_<unit>} and either
+\code{pin_<number>_qaqc} (current) or \code{pin_<number>_qaqc_code}
+(legacy). Both QAQC naming conventions are recognized so that data can
+be pivoted the same way during the transition between them; a single
+call to this function should not mix the two within the same dataset.}
 }
 \value{
 A long-format data frame with one row per pin per original row,
-  including a \code{pin} column, a \code{height_mm} or \code{height_cm}
-  column (matching the unit used in \code{data}), and a \code{qaqc_code}
-  column.
+  including a \code{pin_number} column, a \code{height_mm} or \code{height_cm}
+  column (the unit is detected automatically from whichever is present in
+  \code{data}), and a \code{qaqc_code} column.
 }
 \description{
 Converts wide-format data produced by \code{import_NERRwide()} into long
 format, with one row per pin, by separately pivoting the pin height
-columns and the pin qaqc_code columns and rejoining them.
+columns and the pin QAQC columns and rejoining them.
+}
+\examples{
+pivot_NERRwide(example_sets_wide)
+
 }

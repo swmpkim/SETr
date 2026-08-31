@@ -7,6 +7,11 @@
 plot_incr_pin(
   data,
   set,
+  date = date,
+  set_id = set_id,
+  arm_position = arm_position,
+  pin_number = pin_number,
+  incr = incr,
   threshold = 25,
   columns = 2,
   pointsize = 2,
@@ -14,9 +19,11 @@ plot_incr_pin(
 )
 }
 \arguments{
-\item{data}{data frame (e.g. `$pin` piece of output from `calc_change_incr()`) with one row per faceting variable, and the following columns, named exactly: date, set_id, arm_position, pin_number, incr. `incr` should be an already-calculated field of change since previous reading.}
+\item{data}{data frame (e.g. `$pin` piece of output from `calc_change_incr()`) with one row per faceting variable. `incr` should be an already-calculated field of change since previous reading.}
 
 \item{set}{SET ID to graph (required)}
+
+\item{date, set_id, arm_position, pin_number, incr}{unquoted column names in `data`. Default to `date`, `set_id`, `arm_position`, `pin_number`, `incr` -- the names used by `calc_change_incr()`'s output; override if your data uses different names.}
 
 \item{threshold}{numeric value for red horizontal lines (at +/- this value); this should be a value that would be a meaningful threshold for incremental change.}
 
