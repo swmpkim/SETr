@@ -4,7 +4,6 @@
 # SETr
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of SETr is to simplify calculations and make graphs for QA/QC

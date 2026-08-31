@@ -1,6 +1,6 @@
 Package: SETr
 Title: Working with Surface Elevation Table (SET) Data
-Version: 0.0.0.9003
+Version: 0.1.0
 Authors@R: 
     person(given = "Kim",
            family = "Cressman",
@@ -9,7 +9,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-8083-2434"))
 Description: Simplifies calculations and makes graphs for 
     QA/QC and communication of SET data. Graphs follow those from
-    the National Estuarine Research Reserves' SETr project 
+    the National Estuarine Research Reserves' SETr workflow project 
     <https://nerrssciencecollaborative.org/project/Cressman18>.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -32,3 +32,5 @@ Suggests:
     testthat (>= 2.1.0),
     writexl
 VignetteBuilder: quarto
+URL: https://github.com/nerrscdmo/SETr
+BugReports: https://github.com/nerrscdmo/SETr/issues
