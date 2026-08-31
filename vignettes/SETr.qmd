@@ -8,6 +8,8 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
+message: false
+warning: false
 ---
 
 If you need to install the `SETr` package, you can use the following code.  
@@ -31,12 +33,14 @@ library(SETr)
 
 The assumed format is the wide NERRS format, where each row represents readings from one SET arm on a given reading date (for a typical SET with 4 arm positions, there will be 4 rows per date), with one column for each of the 9 pins' measurements, and one column for a QA/QC code per pin. See the [Analysis Tools and Workflow Guide](https://nerrssciencecollaborative.org/resource/setr-analysis-tools-and-workflow-guide) for more detail on this data format.  
 
-Insert screenshot of wide data  
 
 A data file is bundled with this package, and if you'd like to read it in you can use the following code. Otherwise, you can follow along the rest of this vignette using the built-in dataset `example_sets_wide`.  
 
+You could of course read in your own SET file.  
+
 ```{r}
-dat <- import_NERRwide(system.file("extdata", "example_wide.xlsx", package = "SETr"))
+in_file <- system.file("extdata", "example_wide.xlsx", package = "SETr")
+dat <- import_NERRwide(in_file)
 
 # or
 # dat <- example_sets_wide
@@ -46,7 +50,9 @@ Let's examine this a bit.
 
 ```{r}
 dim(dat)
+
 length(unique(dat$set_id))
+
 length(unique(dat$year))
 ```
 
@@ -56,10 +62,51 @@ This data frame has 228 rows and 26 columns. There are 3 unique SET IDs, and mea
 head(dat[, 1:9])
 ```
 
-Each row represents measurements from a single arm of a given SET on a given date. So for every sample date, at a SET using 4 arm positions, there are 4 rows of measurements. Each arm should contain 9 pins, and there are columns for pin height and QAQC information for each of the pins. Additionally, there is a column named `arm_qaqc_code` that can contain QAQC information for an entire arm. The full list of names is:  
+Again, each row represents measurements from a single arm of a given SET on a given date. So for every sample date, at a SET using 4 arm positions, there are 4 rows of measurements. Each arm should contain 9 pins, and there are columns for pin height and QAQC information for each of the pins. Additionally, there is a column named `arm_qaqc_code` that can contain QAQC information for an entire arm. The full list of names is:  
 
 ```{r}
 names(dat)
+```
+
+## Selecting specific sheets  
+
+If you only want to work with one or two SETs, you can specify them.   
+
+```{r}
+dat_2sheets <- import_NERRwide(in_file, sheets = c("CLMAJ-1", "SPALT-1"))
+```
+
+Verify that we only read in the two SETs of interest.
+
+```{r}
+unique(dat_2sheets$set_id)
+```
+
+
+## Excluding sheets  
+
+Or, if you have an extra README or other sheet that does not contain SET data, you can (should!) exclude it. This is just a special case of selecting sheets, where you select everything but what you don't want.  
+
+In a real case this might be a README, but here, we'll exclude "SPALT-1" as an example.  
+
+```{r}
+shts <- readxl::excel_sheets(in_file)
+shts_to_exclude <- "SPALT-1"
+shts_to_keep <- shts[!(shts %in% shts_to_exclude)]
+
+dat_excluded <- import_NERRwide(in_file, sheets = shts_to_keep)
+```
+
+Verify.  
+
+```{r}
+unique(dat_excluded$set_id)
+```
+
+```{r}
+#| echo: false
+# cleanup
+rm(dat_2sheets, dat_excluded, shts, shts_to_exclude, shts_to_keep)
 ```
 
 
@@ -86,7 +133,13 @@ Some data files use cm rather than mm for their pin measurements, and these func
 
 ```{r}
 names(dat_long)
+```
+
+```{r}
 dat_long <- height_to_mm(dat_long)
+```
+
+```{r}
 names(dat_long)
 ```
 
@@ -97,19 +150,18 @@ names(dat_long)
 During data collection, individual pin readings are sometimes flagged and/or coded to indicate issues that might impact the data, for the user to be aware of. If you would like to exclude any specific information based on what is in the QAQC column for a pin, you can use the `exclude_qaqc()` function. This will set `pin_height` to `NA` for any reading whose QAQC code matches one you specify. The example dataset does not have any associated QAQC flags or codes, but the workflow would look like this:  
 
 ```{r}
-# example_sets doesn't ship with a qaqc_code column, so add one for
-# demonstration -- flag one reading with a made-up "CB" (crab burrow) code
 dat_qaqc <- example_sets[1:5, ]
 dat_qaqc$qaqc_code <- NA
-dat_qaqc$qaqc_code[3] <- "CB"
+dat_qaqc$qaqc_code[3] <- "LHE"
 
 # all data
 dat_qaqc
 
 # excluding suspect pin height
-exclude_qaqc(dat_qaqc, codes = "CB")
+exclude_qaqc(dat_qaqc, codes = "LHE")
 ```
 
+Note, once SWMP-style flagging and coding is official, this will be a little more complex due to the use of different types of brackets for flags and codes. These are all special characters to programming languages and require what's known as "escaping" so they are evaluated as characters.
 
 # 3. Make graphs to help QA/QC data  
 
@@ -122,6 +174,18 @@ Use this as a QA/QC step - make sure nothing looks wildly out of line with your 
 ```{r}
 plot_raw_pin(dat_long, "CLMAJ-1")
 ```
+
+You could of course loop through all SETs in the data at once.  
+
+```{r}
+sts <- unique(dat_long$set_id)
+
+for(i in seq_along(sts)){
+    print(plot_raw_pin(dat_long, sts[i]))
+}
+```
+
+
 
 
 `plot_raw_arm()` graphs all SETs in the data, yielding one facet per SET, with each arm represented as a different color.  
@@ -214,7 +278,9 @@ plot_cumu_set(dat_cumu$set)
 
 # 5. Calculate the rate of change through time  
 
-This step does not use functions from the SETr package, but rather from your favorite way to model data. See [Russell et al. 2022](https://doi.org/10.1007/s10651-021-00524-1) for some considerations. In the SETr project, we followed [Cahoon et al. 2019](https://doi.org/10.1007/s12237-018-0448-x) and used used linear mixed models, and I still believe this is a strong approach. But depending on what you'll be doing with the output, the simplicity of averaging pin readings to the SET level and doing a simple linear regression may suffice.  
+This step does not use functions from the SETr package, but rather from your favorite way to model data. In the SETr project, we followed [Cahoon et al. 2019](https://doi.org/10.1007/s12237-018-0448-x) and used linear mixed models. [Lynch et al.'s (2015)](https://pubs.usgs.gov/publication/70160049) protocols explore linear regression. Also see [Russell et al. 2022](https://doi.org/10.1007/s10651-021-00524-1) for some considerations of various approaches.  
+
+In general, for this step, you'll want to generate a rate of change and a 95% confidence interval for that rate, for each SET.  
 
 
 # 6. Graph change through time  
