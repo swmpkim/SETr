@@ -1,0 +1,30 @@
+url: https://nerrscdmo.github.io/SETr/
+template:
+  bootstrap: 5
+
+reference:
+- title: "Data import, shaping, and cleaning"
+  contents:
+  - import_NERRwide
+  - pivot_NERRwide
+  - height_to_mm
+  - exclude_qaqc
+- title: "Calculations"
+  contents:
+  - calc_change_incr
+  - calc_change_cumu
+- title: "Plotting functions"
+  contents:
+  - plot_raw_pin
+  - plot_raw_arm
+  - plot_incr_pin
+  - plot_incr_arm
+  - plot_hist_arm
+  - plot_cumu_arm
+  - plot_cumu_set
+  - plot_rate_comps
+- title: "Datasets"
+  contents:
+  - example_sets
+  - example_sets_wide
+
