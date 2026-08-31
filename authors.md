@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Kim Cressman**. Author, maintainer, copyright holder.
+- **Kim Cressman**. Author, maintainer.
   [](https://orcid.org/0000-0002-8083-2434)
 
 ## Citation
