@@ -28,15 +28,6 @@ Reads one or more sheets from a NERR-formatted Excel file, row-binds them
 into a single data frame, and verifies that the `set_id` column in each
 sheet matches the name of the sheet it came from. If any mismatches are
 found, the function stops and prints the offending rows for review.
-
-TODO: expand on what "NERR wide" data represents, and any assumptions
-about file/sheet structure (e.g. required columns, expected sheet naming
-convention like "SITE-#").
-}
-\details{
-TODO: note any expectations about column names/types across sheets
-(e.g. `set_id`, `year`, `month`, `arm_position` must exist in every sheet),
-and what happens if sheets have inconsistent columns.
 }
 \section{Errors}{
 

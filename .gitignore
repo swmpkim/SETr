@@ -2,3 +2,5 @@
 .Rhistory
 inst/doc
 **/.quarto/
+/doc/
+/Meta/

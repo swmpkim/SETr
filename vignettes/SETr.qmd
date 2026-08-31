@@ -10,12 +10,22 @@ knitr:
     comment: '#>'
 ---
 
+If you need to install the `SETr` package, you can use the following code.  
+
+```
+# install.packages("remotes")
+remotes::install_github("swmpkim/SETr")
+```
+
+
+In this vignette, we will walk through how to use this package to write your own scripts for the import, analysis, and visualization of Surface Elevation Table (SET) data. The products from the original NERRS Science Collaborative-funded [SETr project](https://nerrssciencecollaborative.org/project/Cressman18) were designed for users who are not comfortable with R, and only want to have to hit a few buttons to run an entire workflow process. The current package is for people who *are* comfortable with R and want to modify or customize the outputs.  
+
+First, load the library.  
+
 ```{r}
-#| label: setup
 library(SETr)
 ```
 
-In this vignette, we will walk through how to use this package to write your own scripts for the import, analysis, and visualization of Surface Elevation Table (SET) data. The products from the original NERRS Science Collaborative-funded [SETr project](https://nerrssciencecollaborative.org/project/Cressman18) were designed for users who are not comfortable with R, and only want to have to hit a few buttons to run an entire workflow process. The current package is for people who *are* comfortable with R and want to modify or customize the outputs.  
 
 # 1. Import data  
 
@@ -23,88 +33,276 @@ The assumed format is the wide NERRS format, where each row represents readings 
 
 Insert screenshot of wide data  
 
-Make example of:  
-`import_NERRwide()`  
+A data file is bundled with this package, and if you'd like to read it in you can use the following code. Otherwise, you can follow along the rest of this vignette using the built-in dataset `example_sets_wide`.  
 
-Show what the imported data looks like (create example dataset if necessary)  
+```{r}
+dat <- import_NERRwide(system.file("extdata", "example_wide.xlsx", package = "SETr"))
+
+# or
+# dat <- example_sets_wide
+```
+
+Let's examine this a bit.  
+
+```{r}
+dim(dat)
+length(unique(dat$set_id))
+length(unique(dat$year))
+```
+
+This data frame has 228 rows and 26 columns. There are 3 unique SET IDs, and measurements across 5 unique years.  
+
+```{r}
+head(dat[, 1:9])
+```
+
+Each row represents measurements from a single arm of a given SET on a given date. So for every sample date, at a SET using 4 arm positions, there are 4 rows of measurements. Each arm should contain 9 pins, and there are columns for pin height and QAQC information for each of the pins. Additionally, there is a column named `arm_qaqc_code` that can contain QAQC information for an entire arm. The full list of names is:  
+
+```{r}
+names(dat)
+```
+
 
 # 2. Reshape data into long format  
 
-The functions used in SETr rely on a long data format: a single pin reading per row. The function `pivot_NERRwide()` does this.  
-
-Create function  
-
-Show example using the wide example dataset from above  
-
-
-# 3. Graph raw data  
-
-Use this as a QA/QC step - make sure nothing looks wildly out of line with your expectations or your other data; if it does, go back to your field sheets and either verify or correct your spreadsheet.  
-
-plot_raw_pin() - one SET at a time; yields one facet per arm position.  
+The functions used in SETr rely on a long data format: a single pin reading per row. The function `pivot_NERRwide()` uses `tidyr::pivot_longer()` to swing both the height and QAQC column for each pin into a row. So now, instead of 4 rows per measurement date per SET, we have 36 rows per measurement date per SET: one row for every individual pin.    
 
 ```{r}
-plot_raw_pin(example_sets, "SET1")
+dat_long <- pivot_NERRwide(dat)
+```
+
+Now we have fewer columns and many more rows. Let's look at the beginning.   
+
+```{r}
+dim(dat_long)
+```
+
+```{r}
+head(dat_long)
 ```
 
 
-plot_raw_arm()  - all SETs in the data; one facet per SET, with each arm represented as a different color.  
+Some data files use cm rather than mm for their pin measurements, and these functions were written to allow either. The function `height_to_mm()` takes either input and returns a data frame with the required names for downstream functions. Even if your original data was in mm, you need to run this step because it changes the name of the pin height column. Notice the names before and after this step.  
 
 ```{r}
-plot_raw_arm(example_sets)
+names(dat_long)
+dat_long <- height_to_mm(dat_long)
+names(dat_long)
 ```
 
-
-Possibly write functions for QA/QC graphs from the shiny app, allowing people to choose their threshold of concern  - plot_incr_pin and plot_incr_arm may be these; need to use calc_change_incr first
 
 
 ## Excluding flagged readings
 
-During data collection, individual pin readings are sometimes flagged with a QA/QC code (e.g. because a crab burrow or standing water made the surface hard to read accurately). `exclude_qaqc()` sets `pin_height` to `NA` for any reading whose QAQC code matches one you specify, so those readings drop out of downstream calculations without having to manually filter rows yourself. Matching is an exact, case-sensitive match against the QAQC code column.
+During data collection, individual pin readings are sometimes flagged and/or coded to indicate issues that might impact the data, for the user to be aware of. If you would like to exclude any specific information based on what is in the QAQC column for a pin, you can use the `exclude_qaqc()` function. This will set `pin_height` to `NA` for any reading whose QAQC code matches one you specify. The example dataset does not have any associated QAQC flags or codes, but the workflow would look like this:  
 
 ```{r}
 # example_sets doesn't ship with a qaqc_code column, so add one for
 # demonstration -- flag one reading with a made-up "CB" (crab burrow) code
-dat_qaqc <- example_sets
-dat_qaqc$qaqc_code <- "OK"
+dat_qaqc <- example_sets[1:5, ]
+dat_qaqc$qaqc_code <- NA
 dat_qaqc$qaqc_code[3] <- "CB"
 
+# all data
+dat_qaqc
+
+# excluding suspect pin height
 exclude_qaqc(dat_qaqc, codes = "CB")
 ```
 
-If you also have an arm-level QAQC column to check, call `exclude_qaqc()` again pointing at it (e.g. `qaqc_code = arm_qaqc_code`). This chains naturally into the rest of the import/pivot workflow:
 
-```r
-import_NERRwide("path/to/file.xlsx") |>
-    pivot_NERRwide() |>
-    height_to_mm() |>
-    exclude_qaqc(codes = c("CB", "DR")) |>
-    calc_change_cumu()
+# 3. Make graphs to help QA/QC data  
+
+## 3a. Graph raw data  
+
+Use this as a QA/QC step - make sure nothing looks wildly out of line with your expectations or your other data; if it does, go back to your field sheets and either verify or correct your spreadsheet.  
+
+`plot_raw_pin()` graphs a single SET, yielding one facet per arm position and one series of points and lines per pin on each arm.  
+
+```{r}
+plot_raw_pin(dat_long, "CLMAJ-1")
 ```
+
+
+`plot_raw_arm()` graphs all SETs in the data, yielding one facet per SET, with each arm represented as a different color.  
+
+```{r}
+plot_raw_arm(dat_long)
+```
+
+This can get a little crowded depending on how many SETs you have. You can change the number of columns with the `columns` argument. Let's try both 2 columns and 1 column.  
+
+```{r}
+plot_raw_arm(dat_long, columns = 2)
+```
+
+```{r}
+plot_raw_arm(dat_long, columns = 1)
+```
+
+
+## 3b. Calculate and graph incremental change  
+
+A useful QA/QC step is making a graph of change since the previous reading - if there is a large difference, there could have been a large deposition or erosion event, or there could be a typo. Either way it is worth noticing! The `plot_incr_*()` functions put this information on a graph, with red lines at whatever threshold you specify. First, incremental change has to be calculated.  
+
+`calc_change_incr()` produces a list: one data frame each for incremental change by pin, by arm position, and by SET. I'll illustrate what this looks like on a smaller example dataset:  
+
+```{r}
+example_incr <- calc_change_incr(example_sets)
+str(example_incr)
+```
+
+On the dataset we're using for the rest of this vignette, the year/month/day and some qa/qc columns carried through but are unimportant. So we didn't need to see them above but are now applying the incremental change calculation to it.  
+
+```{r}
+dat_incr <- calc_change_incr(dat_long)
+```
+
+Now we'll do some graphing. Functions in this package focus on incremental change at the pin level - individual pins seem most susceptible to large changes - and averaged to arm position. You probably ought to investigate points falling outside your threshold of interest!  
+
+You could use the output from `calc_change_incr()` to make your own similar graphs averaged up to SET.
+
+The general threshold of interest for incremental change seems to be 25 mm, so this is the default for where red lines appear in the plot functions. 
+
+At the pin level, you again get one facet per arm position, so you have to specify a single SET. Here is a graph of incremental change by pin, with the default threshold of 25. Note, you also have to specify the data frame within the list, not just the list output of `calc_change_incr()`.   
+
+```{r}
+plot_incr_pin(dat_incr$pin, "CLMAJ-1")
+```
+
+
+The threshold can be modified with the `threshold` argument:  
+
+```{r}
+plot_incr_pin(dat_incr$pin, "CLMAJ-1", threshold = 75)
+```
+
+
+Graphs of incremental change by arm position can be produced for all SETs. As with the raw data graphing functions, you can change the number of columns; and as with `plot_incr_pin()`, you can change the threshold of interest:    
+
+```{r}
+plot_incr_arm(dat_incr$arm, threshold = 10, columns = 1)
+```
+
 
 
 # 4. Calculate and graph cumulative change (change since first reading)
 
-These graphs should look the same as the raw readings, but with 0 at the bottom of the y-axis.  
-First we have to calculate cumulative change by subtracting the first reading at a pin from each subsequent reading:  
+These graphs should look similar to those of raw readings, but all lines will start at 0. As with `calc_change_incr()`, `calc_change_cumu()` produces a list with data frames for pin, arm position, and SET. The plotting functions provided here are only for arm and SET, as they seem to be of more interest than that for individual pins.  
+Here is what output looks like for the simplified example data:  
 
-calc_change_cumu  
+```{r}
+example_cumu <- calc_change_cumu(example_sets)
+str(example_cumu)
+```
 
-Then we can graph:  
+Now we'll apply this to the real example data and make a few graphs. As with the other plotting functions, you can change the number of columns to suit the number of SETs you are working with.    
 
-plot_cumu_pin - this doesn't seem to exist??
-plot_cumu_arm 
-plot_cumu_set  
+```{r}
+dat_cumu <- calc_change_cumu(dat_long)
+
+plot_cumu_arm(dat_cumu$arm)
+```
+
+The graph of cumulative change by SET looks a bit nicer, because it is the simplest SET output to really share. The default graph includes a linear regression line following SET change. This can be turned off by setting `smooth = FALSE`, or made skinnier or thicker using the `lty_smooth` argument (default is 5).
+
+```{r}
+plot_cumu_set(dat_cumu$set)
+```
+
 
 
 # 5. Calculate the rate of change through time  
 
-This step does not use functions from the SETr package, but rather from your favorite way to model data.  
+This step does not use functions from the SETr package, but rather from your favorite way to model data. See [Russell et al. 2022](https://doi.org/10.1007/s10651-021-00524-1) for some considerations. In the SETr project, we followed [Cahoon et al. 2019](https://doi.org/10.1007/s12237-018-0448-x) and used used linear mixed models, and I still believe this is a strong approach. But depending on what you'll be doing with the output, the simplicity of averaging pin readings to the SET level and doing a simple linear regression may suffice.  
 
 
 # 6. Graph change through time  
 
+For simplicity, this graph and its variants will be illustrated with some made up data, rather than performing calculations on the example data.    
+
+```{r}
+example_rates <- data.frame("set_id" = c("SET1", "SET2", "SET3"),
+                            "set_rate" = c(3.2, 4.0, 5.4),
+                            "ci_low" = c(3.0, 3.2, 5.2),
+                            "ci_high" = c(3.4, 4.8, 5.6),
+                            "veg" = c("Spartina", "Juncus", "Distichlis"))
+```
+
+
+Comparing those example rates to a local Sea Level Rise (SLR) rate of 3.5, with a 95% CI of 3.3-3.7: the latter values are all provided via argument; you have to pull them from elsewhere (we suggest using values from the nearest NWLON station):  
+
+```{r}
+plot_rate_comps(data = example_rates,
+                set_ids = set_id,
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7)
+```
+
+If you would like points to be colored by the dominant vegetation at the site, and assuming you have joined such information to your calculated rates, you can do it:
+
+```{r}
+plot_rate_comps(data = example_rates,
+                set_ids = set_id,
+                color_by_veg = TRUE,
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7,
+                veg = veg)
+```
+
+The default colors for the vegetation graph come from RColorBrewer's Dark2 scale, which can handle up to 8 categories. If you have more categories, the color scale will automatically change to viridis:  
+
+```{r}
+# more than 8 vegetation categories -- veg_palette = "auto" (the default)
+# switches to a viridis scale automatically instead of running out of Dark2 colors
+example_rates_many_veg <- data.frame(
+    "set_id" = paste0("SET", 1:10),
+    "set_rate" = seq(2, 6, length.out = 10),
+    "ci_low" = seq(1.8, 5.8, length.out = 10),
+    "ci_high" = seq(2.2, 6.2, length.out = 10),
+    "veg" = paste0("Species", 1:10))
+
+plot_rate_comps(data = example_rates_many_veg,
+                set_ids = set_id,
+                color_by_veg = TRUE,
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7,
+                veg = veg)
+```
+
+
+If you know your 19-year water level change rate, you can also add it. See [this repository](https://github.com/swmpkim/WaterLevels) if you'd like some help getting the data and performing the calculations for your NWLON station.  
+
+```{r}
+plot_rate_comps(data = example_rates,
+                plot_type = 4,
+                set_ids = set_id,
+                set_ci_low = ci_low,
+                set_ci_high = ci_high,
+                rates = set_rate,
+                comp1 = 3.5,
+                comp1_ci_low = 3.3,
+                comp1_ci_high = 3.7,
+                comp2 = 5.5,
+                comp2_ci_low = 5.0,
+                comp2_ci_high = 6.0)
+
+```
+
+
+
+
 ## Sea level rise rates  
 
-
-# 7. Map  

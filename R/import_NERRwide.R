@@ -6,10 +6,6 @@
 #' sheet matches the name of the sheet it came from. If any mismatches are
 #' found, the function stops and prints the offending rows for review.
 #'
-#' TODO: expand on what "NERR wide" data represents, and any assumptions
-#' about file/sheet structure (e.g. required columns, expected sheet naming
-#' convention like "SITE-#").
-#'
 #' @param file Character. Path to the Excel file to read.
 #' @param sheets Character vector of sheet names to read, or `"all"` to read
 #'   every sheet in the file. Defaults to `"all"`. Use this to exclude sheets
@@ -23,11 +19,6 @@
 #'   origin during the mismatch check) is dropped from the final output. If
 #'   `year`, `month`, and `day` columns are all present and there is not
 #'   already a `date` column, a `date` column is added by combining them.
-#'
-#' @details
-#' TODO: note any expectations about column names/types across sheets
-#' (e.g. `set_id`, `year`, `month`, `arm_position` must exist in every sheet),
-#' and what happens if sheets have inconsistent columns.
 #'
 #' @section Errors:
 #' Stops execution if any row's `set_id` does not match its source sheet
