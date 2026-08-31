@@ -11,7 +11,7 @@ Description: Simplifies calculations and makes graphs for
     QA/QC and communication of SET data. Graphs follow those from
     the National Estuarine Research Reserves' SETr workflow project 
     <https://nerrssciencecollaborative.org/project/Cressman18>.
-License: MIT + file LICENSE
+License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
