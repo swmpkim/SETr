@@ -156,6 +156,12 @@ dat_qaqc$qaqc_code[3] <- "LHE"
 
 # all data
 dat_qaqc
+```
+
+Note, a message is printed to the console telling you how many readings were changed to NA. It is in the printed code below between the function and the printed data frame.  
+
+```{r}
+#| message: true
 
 # excluding suspect pin height
 exclude_qaqc(dat_qaqc, codes = "LHE")
