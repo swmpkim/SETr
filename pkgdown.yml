@@ -1,0 +1,9 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  SETr: SETr.html
+last_built: 2026-08-31T16:04Z
+urls:
+  reference: https://nerrscdmo.github.io/SETr/reference
+  article: https://nerrscdmo.github.io/SETr/articles

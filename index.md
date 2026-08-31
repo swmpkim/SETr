@@ -1,0 +1,51 @@
+# SETr
+
+The goal of SETr is to simplify calculations and make graphs for QA/QC
+and communication of Surface Elevation Table (SET) data.
+
+This package is based on functions created as part of a larger workflow.
+All code for that project is also on [GitHub,
+here](https://github.com/swmpkim/SETr_Reserve_Template); and at the top
+of the README for that repo are links to publicly available project
+outputs. Most of the functions here were used in the [Reserve-level
+technical
+reports](https://drive.google.com/drive/folders/1ExY94WWOoS3iY3iJpKdteI96_iFnDdMM?usp=sharing).
+Please see the package vignette for details on using this package.
+
+## Installation
+
+You can install the development version from
+[GitHub](https://github.com/) with:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("nerrscdmo/SETr")
+```
+
+## Example
+
+This is a basic example which shows you how to make a simple graph of
+change since the first reading at each SET:
+
+``` r
+
+library(SETr)
+
+# first, perform cumulative change calculations
+cumu_set <- calc_change_cumu(example_sets)
+
+# now plot cumulative change by SET
+plot_cumu_set(cumu_set$set)
+```
+
+![](reference/figures/README-example-1.png)
+
+``` r
+
+
+# or by arm, at a single SET
+plot_cumu_arm(cumu_set$arm)
+```
+
+![](reference/figures/README-example-2.png)

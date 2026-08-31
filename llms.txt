@@ -1,0 +1,103 @@
+# SETr
+
+The goal of SETr is to simplify calculations and make graphs for QA/QC
+and communication of Surface Elevation Table (SET) data.
+
+This package is based on functions created as part of a larger workflow.
+All code for that project is also on [GitHub,
+here](https://github.com/swmpkim/SETr_Reserve_Template); and at the top
+of the README for that repo are links to publicly available project
+outputs. Most of the functions here were used in the [Reserve-level
+technical
+reports](https://drive.google.com/drive/folders/1ExY94WWOoS3iY3iJpKdteI96_iFnDdMM?usp=sharing).
+Please see the package vignette for details on using this package.
+
+## Installation
+
+You can install the development version from
+[GitHub](https://github.com/) with:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("nerrscdmo/SETr")
+```
+
+## Example
+
+This is a basic example which shows you how to make a simple graph of
+change since the first reading at each SET:
+
+``` r
+
+library(SETr)
+
+# first, perform cumulative change calculations
+cumu_set <- calc_change_cumu(example_sets)
+
+# now plot cumulative change by SET
+plot_cumu_set(cumu_set$set)
+```
+
+![](reference/figures/README-example-1.png)
+
+``` r
+
+
+# or by arm, at a single SET
+plot_cumu_arm(cumu_set$arm)
+```
+
+![](reference/figures/README-example-2.png)
+
+# Package index
+
+## Data import, shaping, and cleaning
+
+- [`import_NERRwide()`](https://nerrscdmo.github.io/SETr/reference/import_NERRwide.md)
+  : Import and combine NERR SWMP wide-format data from an Excel workbook
+- [`pivot_NERRwide()`](https://nerrscdmo.github.io/SETr/reference/pivot_NERRwide.md)
+  : Pivot NERR wide-format SET data to long format
+- [`height_to_mm()`](https://nerrscdmo.github.io/SETr/reference/height_to_mm.md)
+  : Pin Height to mm
+- [`exclude_qaqc()`](https://nerrscdmo.github.io/SETr/reference/exclude_qaqc.md)
+  : Exclude flagged readings by setting them to NA
+
+## Calculations
+
+- [`calc_change_incr()`](https://nerrscdmo.github.io/SETr/reference/calc_change_incr.md)
+  : Incremental Change Calculations
+- [`calc_change_cumu()`](https://nerrscdmo.github.io/SETr/reference/calc_change_cumu.md)
+  : Calculate Cumulative Change at a SET
+
+## Plotting functions
+
+- [`plot_raw_pin()`](https://nerrscdmo.github.io/SETr/reference/plot_raw_pin.md)
+  : Plot raw pin readings for a single SET, faceted by arm position
+- [`plot_raw_arm()`](https://nerrscdmo.github.io/SETr/reference/plot_raw_arm.md)
+  : Plot raw pin measurements, first averaged to arm level, by date
+- [`plot_incr_pin()`](https://nerrscdmo.github.io/SETr/reference/plot_incr_pin.md)
+  : Plot change between readings, by pin
+- [`plot_incr_arm()`](https://nerrscdmo.github.io/SETr/reference/plot_incr_arm.md)
+  : Plot change between readings, by arm
+- [`plot_hist_arm()`](https://nerrscdmo.github.io/SETr/reference/plot_hist_arm.md)
+  : Generate a histogram of pin readings by arm position
+- [`plot_cumu_arm()`](https://nerrscdmo.github.io/SETr/reference/plot_cumu_arm.md)
+  : Make a graph of change over time by arm position
+- [`plot_cumu_set()`](https://nerrscdmo.github.io/SETr/reference/plot_cumu_set.md)
+  : Make a graph of change over time by SET
+- [`plot_rate_comps()`](https://nerrscdmo.github.io/SETr/reference/plot_rate_comps.md)
+  : Graphical comparison of SET change rates to SLR
+
+## Datasets
+
+- [`example_sets`](https://nerrscdmo.github.io/SETr/reference/example_sets.md)
+  : Example SET data
+- [`example_sets_wide`](https://nerrscdmo.github.io/SETr/reference/example_sets_wide.md)
+  : Example wide-format NERR SET data
+
+# Articles
+
+### All vignettes
+
+- [SETr](https://nerrscdmo.github.io/SETr/articles/SETr.md):

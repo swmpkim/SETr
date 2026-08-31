@@ -1,0 +1,55 @@
+# Import and combine NERR SWMP wide-format data from an Excel workbook
+
+Reads one or more sheets from a NERR-formatted Excel file, row-binds
+them into a single data frame, and verifies that the \`set_id\` column
+in each sheet matches the name of the sheet it came from. If any
+mismatches are found, the function stops and prints the offending rows
+for review.
+
+## Usage
+
+``` r
+import_NERRwide(file, sheets = "all")
+```
+
+## Arguments
+
+- file:
+
+  Character. Path to the Excel file to read.
+
+- sheets:
+
+  Character vector of sheet names to read, or \`"all"\` to read every
+  sheet in the file. Defaults to \`"all"\`. Use this to exclude sheets
+  that shouldn't be imported (e.g. a README or metadata sheet).
+
+## Value
+
+A data frame combining all specified sheets, with \`set_id\`,
+\`arm_position\`, and any pin QAQC column (matching
+\`pin\_\<n\>\_qaqc\`, the current convention, or the legacy
+\`pin\_\<n\>\_qaqc_code\`) coerced to character, and any pin height
+column (matching \`pin\_\<n\>\_height\_\<unit\>\`) coerced to numeric.
+The temporary \`sheet\` column (used to identify sheet origin during the
+mismatch check) is dropped from the final output. If \`year\`,
+\`month\`, and \`day\` columns are all present and there is not already
+a \`date\` column, a \`date\` column is added by combining them.
+
+## Errors
+
+Stops execution if any row's \`set_id\` does not match its source sheet
+name, printing the mismatched rows (\`sheet\`, \`set_id\`, \`year\`,
+\`month\`, \`arm_position\`) for inspection.
+
+## Examples
+
+``` r
+wide_file <- system.file("extdata", "example_wide.xlsx", package = "SETr")
+
+# Read all sheets
+dat <- import_NERRwide(wide_file)
+
+# Read only specific sheets
+dat <- import_NERRwide(wide_file, sheets = c("CLMAJ-1", "SPALT-1"))
+```
