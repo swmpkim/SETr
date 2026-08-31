@@ -4,6 +4,7 @@
 # SETr
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of SETr is to simplify calculations and make graphs for QA/QC
@@ -25,7 +26,7 @@ You can install the development version from
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("swmpkim/SETr")
+remotes::install_github("nerrscdmo/SETr")
 ```
 
 ## Example

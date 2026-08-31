@@ -16,7 +16,7 @@ If you need to install the `SETr` package, you can use the following code.
 
 ```
 # install.packages("remotes")
-remotes::install_github("swmpkim/SETr")
+remotes::install_github("nerrscdmo/SETr")
 ```
 
 
