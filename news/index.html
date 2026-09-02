@@ -36,34 +36,36 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="setr-010">SETr 0.1.0<a class="anchor" aria-label="anchor" href="#setr-010"></a></h2>
 <p>First public release.</p>
-<ul><li>Generalized <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code>, <code><a href="../reference/calc_change_incr.html">calc_change_incr()</a></code>, and all <code>plot_*()</code> functions to accept custom column names via tidy evaluation, with defaults matching the previous hardcoded names so existing calls are unaffected.<br></li>
+<div class="section level3">
+<h3 id="major-0-1-0">Major<a class="anchor" aria-label="anchor" href="#major-0-1-0"></a></h3>
+<ul><li>Added a full package vignette walking through the workflow: importing wide NERRS data, reshaping to long format, QA/QC graphs and flag exclusion, and cumulative/incremental change calculations.</li>
+<li>Added a <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> website.</li>
+<li>Created functions to read and reshape NERR-formatted SET data: <code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code> and <code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>. These functions recognize both the upcoming <code>pin_&lt;n&gt;_qaqc</code> QAQC-code suffix and the legacy <code>pin_&lt;n&gt;_qaqc_code</code> suffix, so data can be read the same way during the transition between the two conventions.</li>
+<li>Generalized <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code>, <code><a href="../reference/calc_change_incr.html">calc_change_incr()</a></code>, and all <code>plot_*()</code> functions to accept custom column names via tidy evaluation, with defaults matching the previous hardcoded names so existing calls are unaffected.</li>
+<li>Fixed a bug in <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code> where the first pin reading was subtracted off by row position rather than by date, so the wrong reading could be subtracted if rows weren’t already sorted; rows are now arranged by date before calculating.</li>
+<li>Added <code><a href="../reference/exclude_qaqc.html">exclude_qaqc()</a></code>, to set flagged readings to <code>NA</code> based on a QAQC code column, so they drop out of downstream calculations.<br></li>
+<li>Added automatic color palette change to <code><a href="../reference/plot_rate_comps.html">plot_rate_comps()</a></code> when there are more categories than the default color palette can handle.<br></li>
+<li>Added <code>example_sets_wide</code>, a real (reduced) subset of NERRS SET data in wide format, with its source workbook bundled at <code>inst/extdata/example_wide.xlsx</code>. Real, runnable <code>@examples</code> using it were added to <code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code> and <code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>.<br></li>
+<li>Added test coverage for all <code>plot_*()</code> functions and expanded coverage of <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code>/<code><a href="../reference/calc_change_incr.html">calc_change_incr()</a></code>/<code><a href="../reference/exclude_qaqc.html">exclude_qaqc()</a></code>/<code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code>/<code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>/<code><a href="../reference/plot_rate_comps.html">plot_rate_comps()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor--not-visible-to-user-0-1-0">Minor / not visible to user<a class="anchor" aria-label="anchor" href="#minor--not-visible-to-user-0-1-0"></a></h3>
+<ul><li>Replaced all internal <code>magrittr</code> pipes (<code>%&gt;%</code>) with the base R pipe (<code>|&gt;</code>); dropped the <code>magrittr</code> dependency and raised the minimum required R version to 4.1.<br></li>
 <li>Renamed <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code>’s first argument from <code>dat</code> to <code>data</code>, for consistency with the rest of the package.<br></li>
-<li>Added <code><a href="../reference/exclude_qaqc.html">exclude_qaqc()</a></code>, to set flagged readings to <code>NA</code> based on a QAQC code column, so they drop out of downstream calculations.</li>
-<li>
-<code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code>:
-<ul><li>Now recognizes both the current <code>pin_&lt;n&gt;_qaqc</code> QAQC-code suffix and the legacy <code>pin_&lt;n&gt;_qaqc_code</code> suffix (same generalization applied to <code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>), so data can be read the same way during the transition between the two conventions.</li>
-<li>Combines <code>year</code>/<code>month</code>/<code>day</code> columns into a proper <code>date</code> column, when all three are present and there isn’t already a <code>date</code> column.</li>
-<li>Coerces pin height columns (<code>pin_&lt;n&gt;_height_&lt;unit&gt;</code>) to numeric.</li>
-<li>Fixed a bug where passing more than one sheet name to <code>sheets</code> errored (<code>the condition has length &gt; 1</code>).</li>
-</ul></li>
 <li>
 <code><a href="../reference/plot_rate_comps.html">plot_rate_comps()</a></code>:
 <ul><li>All internal <code>ggplot2</code> calls are now fully package-qualified (<code>ggplot2::</code>), rather than relying on <code>@importFrom</code> declarations.</li>
 <li>Fixed a <code>geom_errorbarh()</code> deprecation (ggplot2 4.0.0) by switching to <code>geom_errorbar(orientation = "y")</code>.</li>
 <li>Added a <code>veg_palette</code> argument: the default <code>"auto"</code> keeps today’s <code>"Dark2"</code> palette for 8 or fewer vegetation categories and automatically switches to a <code>viridis</code> scale for more, so extra categories no longer silently lose their color; any RColorBrewer qualitative palette name (or <code>"viridis"</code>) can be supplied to override this directly.</li>
 </ul></li>
-<li>Fixed a latent bug in <code><a href="../reference/plot_incr_pin.html">plot_incr_pin()</a></code>/<code><a href="../reference/plot_incr_arm.html">plot_incr_arm()</a></code> where faceting relied on an unquoted bare column name instead of proper tidy evaluation.<br></li>
 <li>Added a dark gray reference line at zero to <code><a href="../reference/plot_incr_pin.html">plot_incr_pin()</a></code> and <code><a href="../reference/plot_incr_arm.html">plot_incr_arm()</a></code>.<br></li>
-<li>Fixed a bug in <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code> where the first pin reading was subtracted off by row position rather than by date, so the wrong reading could be subtracted if rows weren’t already sorted; rows are now arranged by date before calculating.</li>
-<li>Added <code>example_sets_wide</code>, a real (reduced) subset of NERRS SET data in wide format, with its source workbook bundled at <code>inst/extdata/example_wide.xlsx</code>. Real, runnable <code>@examples</code> using it were added to <code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code> and <code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>.</li>
 <li>Split data documentation into one file per dataset (<code>R/example_sets.R</code>, <code>R/example_sets_wide.R</code>), matching the one-file-per-object convention already used for functions.</li>
-<li>Replaced all internal <code>magrittr</code> pipes (<code>%&gt;%</code>) with the base R pipe (<code>|&gt;</code>); dropped the <code>magrittr</code> dependency and raised the minimum required R version to 4.1.<br></li>
 <li>Fixed several <code>ggplot2</code> deprecation warnings (<code>size</code> argument renamed to <code>linewidth</code> for line-based geoms) and a <code>tidyselect</code> deprecation warning from using <code>.data</code> inside <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">dplyr::across()</a></code>.<br></li>
-<li>Removed unused <code>@importFrom</code> declarations now that every call to another package’s function is fully qualified (<code>pkg::fun()</code>).<br></li>
-<li>Added test coverage for all <code>plot_*()</code> functions and expanded coverage of <code><a href="../reference/calc_change_cumu.html">calc_change_cumu()</a></code>/<code><a href="../reference/calc_change_incr.html">calc_change_incr()</a></code>/<code><a href="../reference/exclude_qaqc.html">exclude_qaqc()</a></code>/<code><a href="../reference/import_NERRwide.html">import_NERRwide()</a></code>/<code><a href="../reference/pivot_NERRwide.html">pivot_NERRwide()</a></code>/<code><a href="../reference/plot_rate_comps.html">plot_rate_comps()</a></code>.</li>
-<li>Added a full package vignette walking through the workflow: importing wide NERRS data, reshaping to long format, QA/QC graphs and flag exclusion, and cumulative/incremental change calculations.</li>
+<li>Removed unused <code>@importFrom</code> declarations.</li>
 </ul></div>
-  </main></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
